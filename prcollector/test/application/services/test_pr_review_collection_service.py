@@ -1,0 +1,196 @@
+"""
+Tests for PRReviewCollectionService.
+"""
+
+import pytest
+from datetime import datetime
+from pathlib import Path
+from unittest.mock import MagicMock, patch
+from prcollector.src.application.services.pr_review_collection_service import PRReviewCollectionService
+from prcollector.src.domain.date_range import DateRange
+from prcollector.src.domain.repository_identifier import RepositoryIdentifier
+from prcollector.src.domain.pull_request_metadata import PullRequestMetadata
+from prcollector.src.domain.review_comment import ReviewComment
+
+
+class TestPRReviewCollectionService:
+    """Test cases for PRReviewCollectionService."""
+
+    def test___init___初期化_サービスが正しく初期化される(self):
+        """Test __init__ initializes the service correctly."""
+        mock_github = MagicMock()
+        mock_formatter = MagicMock()
+        mock_writer = MagicMock()
+
+        service = PRReviewCollectionService(
+            github_repository=mock_github,
+            output_formatter=mock_formatter,
+            output_writer=mock_writer
+        )
+
+        assert service._github_repository == mock_github
+        assert service._output_formatter == mock_formatter
+        assert service._output_writer == mock_writer
+
+    def test_collect_review_comments_正常実行_レビューコメントが収集される(self):
+        """Test collect_review_comments executes successfully."""
+        mock_github = MagicMock()
+        mock_formatter = MagicMock()
+        mock_writer = MagicMock()
+
+        service = PRReviewCollectionService(
+            github_repository=mock_github,
+            output_formatter=mock_formatter,
+            output_writer=mock_writer
+        )
+
+        repo_id = RepositoryIdentifier(owner="test", name="repo")
+        date_range = DateRange(
+            start_date=datetime(2023, 1, 1),
+            end_date=datetime(2023, 1, 2)
+        )
+        output_dir = Path("test_dir")
+
+        # Mock PR metadata with comments
+        comment = ReviewComment(
+            comment_id=1,
+            file_path="test.py",
+            position=1,
+            commit_id="abc",
+            author="user",
+            created_at=datetime.now(),
+            body="comment",
+            diff_context="diff"
+        )
+        pr_metadata = PullRequestMetadata(
+            number=1,
+            title="Test PR",
+            closed_at=datetime.now(),
+            is_merged=True,
+            review_comments=[comment]
+        )
+
+        mock_github.find_closed_pull_requests_in_range.return_value = [pr_metadata]
+        mock_writer.file_exists.return_value = False
+        mock_formatter.format_comments.return_value = "comments"
+        mock_formatter.format_diff_excerpt.return_value = "diff"
+
+        service.collect_review_comments(repo_id, date_range, output_dir)
+
+        mock_github.find_closed_pull_requests_in_range.assert_called_once_with(repo_id, date_range)
+        mock_writer.write_pr_data.assert_called_once()
+
+    def test_collect_review_comments_例外発生_PRReviewCollectionErrorが発生する(self):
+        """Test collect_review_comments raises PRReviewCollectionError on exception."""
+        mock_github = MagicMock()
+        mock_formatter = MagicMock()
+        mock_writer = MagicMock()
+
+        service = PRReviewCollectionService(
+            github_repository=mock_github,
+            output_formatter=mock_formatter,
+            output_writer=mock_writer
+        )
+
+        repo_id = RepositoryIdentifier(owner="test", name="repo")
+        date_range = DateRange(
+            start_date=datetime(2023, 1, 1),
+            end_date=datetime(2023, 1, 2)
+        )
+        output_dir = Path("test_dir")
+
+        mock_github.find_closed_pull_requests_in_range.side_effect = Exception("Test error")
+
+        from prcollector.src.application.exceptions.pr_review_collection_error import PRReviewCollectionError
+        with pytest.raises(PRReviewCollectionError):
+            service.collect_review_comments(repo_id, date_range, output_dir)
+
+    def test__process_single_pr_ファイルが存在する_Falseが返される(self):
+        """Test _process_single_pr returns False when file exists."""
+        mock_github = MagicMock()
+        mock_formatter = MagicMock()
+        mock_writer = MagicMock()
+
+        service = PRReviewCollectionService(
+            github_repository=mock_github,
+            output_formatter=mock_formatter,
+            output_writer=mock_writer
+        )
+
+        pr_metadata = PullRequestMetadata(
+            number=1,
+            title="Test PR",
+            closed_at=datetime.now(),
+            is_merged=True,
+            review_comments=[]
+        )
+        output_dir = Path("test_dir")
+
+        mock_writer.file_exists.return_value = True
+
+        result = service._process_single_pr(pr_metadata, output_dir)
+        assert result is False
+
+    def test__process_single_pr_コメントなし_Falseが返される(self):
+        """Test _process_single_pr returns False when no comments."""
+        mock_github = MagicMock()
+        mock_formatter = MagicMock()
+        mock_writer = MagicMock()
+
+        service = PRReviewCollectionService(
+            github_repository=mock_github,
+            output_formatter=mock_formatter,
+            output_writer=mock_writer
+        )
+
+        pr_metadata = PullRequestMetadata(
+            number=1,
+            title="Test PR",
+            closed_at=datetime.now(),
+            is_merged=True,
+            review_comments=[]
+        )
+        output_dir = Path("test_dir")
+
+        mock_writer.file_exists.return_value = False
+
+        result = service._process_single_pr(pr_metadata, output_dir)
+        assert result is False
+
+    def test__process_single_pr_正常処理_Trueが返される(self):
+        """Test _process_single_pr returns True on successful processing."""
+        mock_github = MagicMock()
+        mock_formatter = MagicMock()
+        mock_writer = MagicMock()
+
+        service = PRReviewCollectionService(
+            github_repository=mock_github,
+            output_formatter=mock_formatter,
+            output_writer=mock_writer
+        )
+
+        comment = ReviewComment(
+            comment_id=1,
+            file_path="test.py",
+            position=1,
+            commit_id="abc",
+            author="user",
+            created_at=datetime.now(),
+            body="comment",
+            diff_context="diff"
+        )
+        pr_metadata = PullRequestMetadata(
+            number=1,
+            title="Test PR",
+            closed_at=datetime.now(),
+            is_merged=True,
+            review_comments=[comment]
+        )
+        output_dir = Path("test_dir")
+
+        mock_writer.file_exists.return_value = False
+        mock_formatter.format_comments.return_value = "comments"
+        mock_formatter.format_diff_excerpt.return_value = "diff"
+
+        result = service._process_single_pr(pr_metadata, output_dir)
+        assert result is True
