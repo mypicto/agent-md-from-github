@@ -144,14 +144,17 @@ $ python src/main.py --repo "example/test-repo" --from-date "2025-09-01" --to-da
 2025-09-12 14:30:00 - prcollector - INFO - Starting collection for example/test-repo
 2025-09-12 14:30:00 - prcollector - INFO - Period: 2025-09-01 to 2025-09-05
 2025-09-12 14:30:01 - prcollector - INFO - Searching for PRs closed between 2025-09-01 00:00:00+09:00 and 2025-09-05 23:59:59+09:00
-2025-09-12 14:30:02 - prcollector - INFO - Found 3 PRs closed in the specified period
+2025-09-12 14:30:01 - prcollector - INFO - Starting PR search...
+2025-09-12 14:30:02 - prcollector - INFO - Found PR #123: Fix data validation
 2025-09-12 14:30:02 - prcollector - INFO - Processing PR #123: Fix data validation
 2025-09-12 14:30:03 - prcollector - INFO - Saved PR #123 data (2 comments)
-2025-09-12 14:30:03 - prcollector - INFO - Processing PR #124: Update documentation
+2025-09-12 14:30:03 - prcollector - INFO - Found PR #124: Update documentation
 2025-09-12 14:30:03 - prcollector - INFO - No review comments found for PR #124
-2025-09-12 14:30:03 - prcollector - INFO - Processing PR #125: Refactor database layer
-2025-09-12 14:30:04 - prcollector - INFO - Saved PR #125 data (5 comments)
-2025-09-12 14:30:04 - prcollector - INFO - Collection completed
+2025-09-12 14:30:04 - prcollector - INFO - Found PR #125: Refactor database layer
+2025-09-12 14:30:04 - prcollector - INFO - Processing PR #125: Refactor database layer
+2025-09-12 14:30:05 - prcollector - INFO - Saved PR #125 data (5 comments)
+2025-09-12 14:30:05 - prcollector - INFO - PR search completed. Found 3 matching PRs.
+2025-09-12 14:30:05 - prcollector - INFO - Collection completed. Found 3 PRs, processed 2 PRs with review comments.
 ```
 
 ## 技術仕様

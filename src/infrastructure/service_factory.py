@@ -63,15 +63,22 @@ class ServiceFactory:
         Returns:
             Configured logger
         """
+        # Set up root logger for the application
+        root_logger = logging.getLogger()
+        root_logger.setLevel(logging.DEBUG if verbose else logging.INFO)
+        
+        # Remove existing handlers to avoid duplicates
+        for handler in root_logger.handlers[:]:
+            root_logger.removeHandler(handler)
+        
+        # Create and configure handler
+        handler = logging.StreamHandler()
+        formatter = logging.Formatter(
+            '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+        )
+        handler.setFormatter(formatter)
+        root_logger.addHandler(handler)
+        
+        # Return the application-specific logger
         logger = logging.getLogger("prcollector")
-        logger.setLevel(logging.DEBUG if verbose else logging.INFO)
-        
-        if not logger.handlers:
-            handler = logging.StreamHandler()
-            formatter = logging.Formatter(
-                '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
-            )
-            handler.setFormatter(formatter)
-            logger.addHandler(handler)
-        
         return logger

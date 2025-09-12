@@ -4,6 +4,7 @@ GitHub API repository implementation.
 
 import logging
 from datetime import datetime
+from typing import Generator
 
 from github import Github
 from github.GithubException import GithubException
@@ -29,24 +30,25 @@ class GitHubRepository:
         """
         self._github = github_client
         self._timezone_converter = timezone_converter
-        self._logger = logging.getLogger(__name__)
+        self._logger = logging.getLogger("prcollector")
     
     def find_closed_pull_requests_in_range(
         self, 
         repo_id: RepositoryIdentifier, 
         date_range: DateRange
-    ) -> list[PullRequestMetadata]:
+    ) -> Generator[PullRequestMetadata, None, None]:
         """Find closed PRs within the specified date range."""
         try:
             repo = self._github.get_repo(repo_id.to_string())
         except GithubException as e:
             raise GitHubApiError(f"Failed to access repository {repo_id.to_string()}: {e}")
         
-        closed_prs = []
-        
         try:
             # Get all closed PRs (both merged and closed without merge)
             prs = repo.get_pulls(state='closed', sort='updated', direction='desc')
+            
+            self._logger.info("Starting PR search...")
+            pr_count = 0
             
             for pr in prs:
                 if pr.closed_at is None:
@@ -56,17 +58,20 @@ class GitHubRepository:
                 closed_at_tz = self._timezone_converter.convert_to_target_timezone(pr.closed_at)
                 
                 if date_range.contains(closed_at_tz):
+                    pr_count += 1
+                    self._logger.debug(f"Found matching PR #{pr.number} (closed: {closed_at_tz.date()})")
                     pr_metadata = self._convert_to_pr_metadata(pr, closed_at_tz)
-                    closed_prs.append(pr_metadata)
+                    yield pr_metadata
                 elif closed_at_tz < date_range.start_date:
                     # PRs are sorted by updated date in descending order
                     # If we hit a PR older than our range, we can stop
+                    self._logger.debug(f"Reached PR #{pr.number} older than range, stopping search")
                     break
+            
+            self._logger.info(f"PR search completed. Found {pr_count} matching PRs.")
                     
         except GithubException as e:
             raise GitHubApiError(f"Error fetching PRs: {e}")
-        
-        return closed_prs
     
     def _convert_to_pr_metadata(self, pr, closed_at_tz: datetime) -> PullRequestMetadata:
         """Convert GitHub PR object to domain model."""

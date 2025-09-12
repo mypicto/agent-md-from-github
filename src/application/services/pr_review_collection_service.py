@@ -33,7 +33,7 @@ class PRReviewCollectionService:
         self._github_repository = github_repository
         self._output_formatter = output_formatter
         self._output_writer = output_writer
-        self._logger = logging.getLogger(__name__)
+        self._logger = logging.getLogger("prcollector")
     
     def collect_review_comments(
         self,
@@ -53,23 +53,24 @@ class PRReviewCollectionService:
         """
         self._logger.info(f"Starting collection for {repository_id.to_string()}")
         self._logger.info(f"Period: {date_range.start_date.date()} to {date_range.end_date.date()}")
+        self._logger.info(f"Searching for PRs closed between {date_range.start_date.strftime('%Y-%m-%d %H:%M:%S%z')} and {date_range.end_date.strftime('%Y-%m-%d %H:%M:%S%z')}")
         
         try:
-            # Find PRs closed in the specified period
-            closed_prs = self._github_repository.find_closed_pull_requests_in_range(
+            # Find and process PRs in streaming fashion
+            processed_count = 0
+            total_found = 0
+            
+            for pr_metadata in self._github_repository.find_closed_pull_requests_in_range(
                 repository_id, 
                 date_range
-            )
-            
-            self._logger.info(f"Found {len(closed_prs)} PRs closed in the specified period")
-            
-            # Process each PR
-            processed_count = 0
-            for pr_metadata in closed_prs:
+            ):
+                total_found += 1
+                self._logger.info(f"Found PR #{pr_metadata.number}: {pr_metadata.title}")
+                
                 if self._process_single_pr(pr_metadata, output_directory):
                     processed_count += 1
             
-            self._logger.info(f"Collection completed. Processed {processed_count} PRs with review comments.")
+            self._logger.info(f"Collection completed. Found {total_found} PRs, processed {processed_count} PRs with review comments.")
             
         except Exception as e:
             raise PRReviewCollectionError(f"Failed to collect review comments: {e}") from e
