@@ -43,17 +43,17 @@ export GITHUB_TOKEN="your_github_token_here"
 
 ```bash
 # 環境変数でトークンを設定している場合
-python src/main.py --repo "octo-org/example" --from-date "2025-09-01" --to-date "2025-09-10"
+python prcollector/src/main.py --repo "octo-org/example" --from-date "2025-09-01" --to-date "2025-09-10"
 
 # トークンを直接指定する場合
-python src/main.py --repo "octo-org/example" --from-date "2025-09-01" --to-date "2025-09-10" --token "your_token"
+python prcollector/src/main.py --repo "octo-org/example" --from-date "2025-09-01" --to-date "2025-09-10" --token "your_token"
 ```
 
 ### 高度な使用例
 
 ```bash
 # 出力ディレクトリとタイムゾーンを指定
-python src/main.py \
+python prcollector/src/main.py \
   --repo "owner/repository" \
   --from-date "2025-08-01" \
   --to-date "2025-08-31" \
@@ -139,7 +139,7 @@ Comment: ここは例外処理を追加したいです
 ### 実際の実行例とログ出力
 
 ```bash
-$ python src/main.py --repo "example/test-repo" --from-date "2025-09-01" --to-date "2025-09-05" --verbose
+$ python prcollector/src/main.py --repo "example/test-repo" --from-date "2025-09-01" --to-date "2025-09-05" --verbose
 
 2025-09-12 14:30:00 - prcollector - INFO - Starting collection for example/test-repo
 2025-09-12 14:30:00 - prcollector - INFO - Period: 2025-09-01 to 2025-09-05

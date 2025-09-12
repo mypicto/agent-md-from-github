@@ -10,9 +10,9 @@ import sys
 import os
 
 # Add the parent directory to Python path to enable relative imports
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 
 if __name__ == "__main__":
-    from src.presentation.cli_controller import CLIController
+    from prcollector.src.presentation.cli_controller import CLIController
     cli = CLIController()
     cli.run()
