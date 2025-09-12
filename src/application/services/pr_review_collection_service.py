@@ -1,0 +1,119 @@
+"""
+Application service for PR review collection.
+"""
+
+import logging
+from pathlib import Path
+
+from ...domain.date_range import DateRange
+from ...domain.pull_request_metadata import PullRequestMetadata
+from ...domain.repository_identifier import RepositoryIdentifier
+from ...domain.interfaces.github_repository_interface import GitHubRepositoryInterface
+from ...domain.interfaces.output_formatter_interface import OutputFormatterInterface
+from ...domain.interfaces.output_writer_interface import OutputWriterInterface
+from ..exceptions.pr_review_collection_error import PRReviewCollectionError
+
+
+class PRReviewCollectionService:
+    """Application service for collecting PR review comments."""
+    
+    def __init__(
+        self,
+        github_repository: GitHubRepositoryInterface,
+        output_formatter: OutputFormatterInterface,
+        output_writer: OutputWriterInterface
+    ):
+        """Initialize PR review collection service.
+        
+        Args:
+            github_repository: GitHub repository interface
+            output_formatter: Output formatting strategy
+            output_writer: Output writing strategy
+        """
+        self._github_repository = github_repository
+        self._output_formatter = output_formatter
+        self._output_writer = output_writer
+        self._logger = logging.getLogger(__name__)
+    
+    def collect_review_comments(
+        self,
+        repository_id: RepositoryIdentifier,
+        date_range: DateRange,
+        output_directory: Path
+    ) -> None:
+        """Collect review comments from PRs in the specified date range.
+        
+        Args:
+            repository_id: Target repository identifier
+            date_range: Date range for filtering PRs
+            output_directory: Output directory for results
+        
+        Raises:
+            PRReviewCollectionError: If collection fails
+        """
+        self._logger.info(f"Starting collection for {repository_id.to_string()}")
+        self._logger.info(f"Period: {date_range.start_date.date()} to {date_range.end_date.date()}")
+        
+        try:
+            # Find PRs closed in the specified period
+            closed_prs = self._github_repository.find_closed_pull_requests_in_range(
+                repository_id, 
+                date_range
+            )
+            
+            self._logger.info(f"Found {len(closed_prs)} PRs closed in the specified period")
+            
+            # Process each PR
+            processed_count = 0
+            for pr_metadata in closed_prs:
+                if self._process_single_pr(pr_metadata, output_directory):
+                    processed_count += 1
+            
+            self._logger.info(f"Collection completed. Processed {processed_count} PRs with review comments.")
+            
+        except Exception as e:
+            raise PRReviewCollectionError(f"Failed to collect review comments: {e}") from e
+    
+    def _process_single_pr(self, pr_metadata: PullRequestMetadata, output_directory: Path) -> bool:
+        """Process a single PR.
+        
+        Args:
+            pr_metadata: PR metadata
+            output_directory: Output directory
+            
+        Returns:
+            True if PR was processed, False if skipped
+        """
+        # Check for idempotency
+        if self._output_writer.file_exists(pr_metadata, output_directory):
+            self._logger.info(f"Skipping PR #{pr_metadata.number} - files already exist")
+            return False
+        
+        # Skip PRs without review comments
+        if not pr_metadata.has_review_comments():
+            self._logger.info(f"No review comments found for PR #{pr_metadata.number}")
+            return False
+        
+        self._logger.info(f"Processing PR #{pr_metadata.number}: {pr_metadata.title}")
+        
+        try:
+            # Format output content
+            comments_content = self._output_formatter.format_comments(pr_metadata)
+            diff_content = self._output_formatter.format_diff_excerpt(pr_metadata)
+            
+            # Write output
+            self._output_writer.write_pr_data(
+                pr_metadata,
+                comments_content,
+                diff_content,
+                output_directory
+            )
+            
+            self._logger.info(
+                f"Saved PR #{pr_metadata.number} data ({len(pr_metadata.review_comments)} comments)"
+            )
+            return True
+            
+        except Exception as e:
+            self._logger.error(f"Error processing PR #{pr_metadata.number}: {e}")
+            return False

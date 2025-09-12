@@ -43,17 +43,17 @@ export GITHUB_TOKEN="your_github_token_here"
 
 ```bash
 # 環境変数でトークンを設定している場合
-python prcollector.py --repo "octo-org/example" --from-date "2025-09-01" --to-date "2025-09-10"
+python src/main.py --repo "octo-org/example" --from-date "2025-09-01" --to-date "2025-09-10"
 
 # トークンを直接指定する場合
-python prcollector.py --repo "octo-org/example" --from-date "2025-09-01" --to-date "2025-09-10" --token "your_token"
+python src/main.py --repo "octo-org/example" --from-date "2025-09-01" --to-date "2025-09-10" --token "your_token"
 ```
 
 ### 高度な使用例
 
 ```bash
 # 出力ディレクトリとタイムゾーンを指定
-python prcollector.py \
+python src/main.py \
   --repo "owner/repository" \
   --from-date "2025-08-01" \
   --to-date "2025-08-31" \
@@ -139,7 +139,7 @@ Comment: ここは例外処理を追加したいです
 ### 実際の実行例とログ出力
 
 ```bash
-$ python prcollector.py --repo "example/test-repo" --from-date "2025-09-01" --to-date "2025-09-05" --verbose
+$ python src/main.py --repo "example/test-repo" --from-date "2025-09-01" --to-date "2025-09-05" --verbose
 
 2025-09-12 14:30:00 - prcollector - INFO - Starting collection for example/test-repo
 2025-09-12 14:30:00 - prcollector - INFO - Period: 2025-09-01 to 2025-09-05
@@ -206,11 +206,26 @@ Error: Failed to access repository owner/repo: 404 {...}
 
 ### コード構造
 
-- `PRCollector`クラス: メインのコレクションロジック
-- `_get_closed_prs_in_period()`: 期間内のPR取得
-- `_process_pr()`: 個別PR処理
-- `_get_review_comments()`: レビューコメント取得
-- `_generate_diff_excerpt()`: Diff抜粋生成
+新しいClean Architectureでは以下のように組織化されています：
+
+**Domain Layer**
+- `DateRange`: 日付範囲のValue Object
+- `RepositoryIdentifier`: リポジトリ識別子のValue Object 
+- `ReviewComment`: レビューコメントのValue Object
+- `PullRequestMetadata`: PRメタデータのValue Object
+
+**Application Layer**
+- `PRReviewCollectionService`: メインのビジネスロジック
+
+**Infrastructure Layer**
+- `GitHubRepository`: GitHub API操作
+- `TimezoneConverter`: タイムゾーン変換
+- `JsonOutputFormatter`: JSON出力フォーマット
+- `FileSystemOutputWriter`: ファイルシステム出力
+- `ServiceFactory`: 依存関係の組み立て
+
+**Presentation Layer**
+- `CLIController`: コマンドラインインターフェース
 
 ### ログレベル
 
