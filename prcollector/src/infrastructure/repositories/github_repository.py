@@ -64,7 +64,8 @@ class GitHubRepository:
                         number=pr.number,
                         title=pr.title,
                         closed_at=closed_at_tz,
-                        is_merged=pr.merged
+                        is_merged=pr.merged,
+                        repository_id=repo_id
                     )
                     yield basic_info
                 elif closed_at_tz < date_range.start_date:
@@ -91,12 +92,12 @@ class GitHubRepository:
             # Convert closed_at to target timezone
             closed_at_tz = self._timezone_converter.convert_to_target_timezone(pr.closed_at)
             
-            return self._convert_to_pr_metadata(pr, closed_at_tz)
+            return self._convert_to_pr_metadata(pr, closed_at_tz, repo_id)
             
         except GithubException as e:
             raise GitHubApiError(f"Error fetching PR #{pr_number}: {e}")
     
-    def _convert_to_pr_metadata(self, pr, closed_at_tz: datetime) -> PullRequestMetadata:
+    def _convert_to_pr_metadata(self, pr, closed_at_tz: datetime, repo_id: RepositoryIdentifier) -> PullRequestMetadata:
         """Convert GitHub PR object to domain model."""
         review_comments = self._extract_review_comments(pr)
         
@@ -105,7 +106,8 @@ class GitHubRepository:
             title=pr.title,
             closed_at=closed_at_tz,
             is_merged=pr.merged,
-            review_comments=review_comments
+            review_comments=review_comments,
+            repository_id=repo_id
         )
     
     def _extract_review_comments(self, pr) -> list[ReviewComment]:

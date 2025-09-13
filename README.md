@@ -145,15 +145,23 @@ python prcollector/src/main.py collector \
 
 ```text
 pullrequests/
-├── 2025-09-01/
-│   ├── PR-123-comments.json
-│   ├── PR-123-diff.patch
-│   ├── PR-124-comments.json
-│   └── PR-124-diff.patch
-├── 2025-09-02/
-│   ├── PR-125-comments.json
-│   └── PR-125-diff.patch
-└── ...
+├── owner1/
+│   ├── repo1/
+│   │   ├── 2025-09-01/
+│   │   │   ├── PR-123-comments.json
+│   │   │   └── PR-123-diff.patch
+│   │   ├── 2025-09-02/
+│   │   │   ├── PR-456-comments.json
+│   │   │   └── PR-456-diff.patch
+│   ├── repo2/
+│   │   ├── 2025-09-03/
+│   │   │   ├── PR-789-comments.json
+│   │   │   └── PR-789-diff.patch
+├── owner2/
+│   └── repo3/
+│       ├── 2025-09-04/
+│       │   ├── PR-101-comments.json
+│       │   └── PR-101-diff.patch
 ```
 
 ### JSON出力形式（`PR-{number}-comments.json`）

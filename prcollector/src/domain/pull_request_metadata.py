@@ -7,6 +7,7 @@ from datetime import datetime
 from typing import List
 
 from .review_comment import ReviewComment
+from .repository_identifier import RepositoryIdentifier
 
 
 @dataclass(frozen=True)
@@ -18,3 +19,4 @@ class PullRequestMetadata:
     closed_at: datetime
     is_merged: bool
     review_comments: List[ReviewComment]
+    repository_id: RepositoryIdentifier

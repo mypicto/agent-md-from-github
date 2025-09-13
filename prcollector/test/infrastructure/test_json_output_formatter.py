@@ -7,6 +7,7 @@ from datetime import datetime
 from prcollector.src.infrastructure.json_output_formatter import JsonOutputFormatter
 from prcollector.src.domain.pull_request_metadata import PullRequestMetadata
 from prcollector.src.domain.review_comment import ReviewComment
+from prcollector.src.domain.repository_identifier import RepositoryIdentifier
 
 
 class TestJsonOutputFormatter:
@@ -15,6 +16,7 @@ class TestJsonOutputFormatter:
     def test_format_comments_正常フォーマット_JSON文字列が返される(self):
         """Test format_comments formats comments as JSON string."""
         formatter = JsonOutputFormatter()
+        repo_id = RepositoryIdentifier(owner="test", name="repo")
         comment = ReviewComment(
             comment_id=1,
             file_path="test.py",
@@ -30,7 +32,8 @@ class TestJsonOutputFormatter:
             title="Test PR",
             closed_at=datetime(2023, 1, 1, 12, 0, 0),
             is_merged=True,
-            review_comments=[comment]
+            review_comments=[comment],
+            repository_id=repo_id
         )
 
         result = formatter.format_comments(pr_metadata)
@@ -45,6 +48,7 @@ class TestJsonOutputFormatter:
     def test_format_diff_excerpt_正常フォーマット_マークダウン文字列が返される(self):
         """Test format_diff_excerpt formats diff as markdown string."""
         formatter = JsonOutputFormatter()
+        repo_id = RepositoryIdentifier(owner="test", name="repo")
         comment = ReviewComment(
             comment_id=1,
             file_path="test.py",
@@ -60,7 +64,8 @@ class TestJsonOutputFormatter:
             title="Test PR",
             closed_at=datetime(2023, 1, 1, 12, 0, 0),
             is_merged=True,
-            review_comments=[comment]
+            review_comments=[comment],
+            repository_id=repo_id
         )
 
         result = formatter.format_diff_excerpt(pr_metadata)

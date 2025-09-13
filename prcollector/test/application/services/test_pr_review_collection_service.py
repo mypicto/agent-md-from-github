@@ -68,7 +68,8 @@ class TestPRReviewCollectionService:
             title="Test PR",
             closed_at=datetime.now(),
             is_merged=True,
-            review_comments=[comment]
+            review_comments=[comment],
+            repository_id=repo_id
         )
 
         # Mock basic info
@@ -76,7 +77,8 @@ class TestPRReviewCollectionService:
             number=1,
             title="Test PR",
             closed_at=datetime.now(),
-            is_merged=True
+            is_merged=True,
+            repository_id=repo_id
         )
 
         mock_github.find_closed_prs_basic_info.return_value = [basic_info]
@@ -139,12 +141,14 @@ class TestPRReviewCollectionService:
             body="comment",
             diff_context="diff"
         )
+        repo_id = RepositoryIdentifier(owner="test", name="repo")
         pr_metadata = PullRequestMetadata(
             number=1,
             title="Test PR",
             closed_at=datetime.now(),
             is_merged=True,
-            review_comments=[comment]
+            review_comments=[comment],
+            repository_id=repo_id
         )
         output_dir = Path("test_dir")
 

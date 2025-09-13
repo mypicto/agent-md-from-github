@@ -7,6 +7,7 @@ from pathlib import Path
 from unittest.mock import patch, mock_open
 from prcollector.src.infrastructure.file_system_output_writer import FileSystemOutputWriter
 from prcollector.src.domain.pull_request_metadata import PullRequestMetadata
+from prcollector.src.domain.repository_identifier import RepositoryIdentifier
 
 
 class TestFileSystemOutputWriter:
@@ -15,12 +16,14 @@ class TestFileSystemOutputWriter:
     def test_write_pr_data_正常書き込み_ファイルが作成される(self):
         """Test write_pr_data writes files correctly."""
         writer = FileSystemOutputWriter()
+        repo_id = RepositoryIdentifier(owner="test", name="repo")
         pr_metadata = PullRequestMetadata(
             number=1,
             title="Test PR",
             closed_at=datetime(2023, 1, 1),
             is_merged=True,
-            review_comments=[]
+            review_comments=[],
+            repository_id=repo_id
         )
         comments_content = '{"test": "data"}'
         diff_content = "diff content"

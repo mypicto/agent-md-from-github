@@ -19,9 +19,9 @@ class FileSystemOutputWriter:
         output_directory: Path
     ) -> None:
         """Write PR data to file system."""
-        # Create date-based directory structure
+        # Create repository-based directory structure
         date_folder = pr_metadata.closed_at.strftime("%Y-%m-%d")
-        output_path = output_directory / date_folder
+        output_path = output_directory / pr_metadata.repository_id.owner / pr_metadata.repository_id.name / date_folder
         output_path.mkdir(parents=True, exist_ok=True)
         
         # Define file paths
@@ -35,7 +35,7 @@ class FileSystemOutputWriter:
     def file_exists_from_basic_info(self, basic_info: PullRequestBasicInfo, output_directory: Path) -> bool:
         """Check if PR files already exist using basic info."""
         date_folder = basic_info.closed_at.strftime("%Y-%m-%d")
-        output_path = output_directory / date_folder
+        output_path = output_directory / basic_info.repository_id.owner / basic_info.repository_id.name / date_folder
         comments_file = output_path / f"PR-{basic_info.number}-comments.json"
         return comments_file.exists()
     
