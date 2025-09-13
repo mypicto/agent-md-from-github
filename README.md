@@ -23,12 +23,20 @@ GitHubリポジトリの指定期間内にクローズされたプルリクエ�
 
 ## 必要な権限
 
-GitHub Fine-grained personal access tokenで以下の権限が必要です：
+### Fine-grained personal access token （あなたがリポジトリのオーナーの場合）
+
+以下の権限が必要です（動作未確認）：
 
 - **Pull requests**: Read
 - **Contents**: Read  
 - **Metadata**: Read
 - **Issues**: Read
+
+### Classic personal access token
+
+以下の権限が必要です：
+
+- **repo**（Full control of private repositories）: Read and write
 
 ## インストール
 
