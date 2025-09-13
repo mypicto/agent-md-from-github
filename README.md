@@ -16,7 +16,7 @@ GitHubリポジトリの指定期間内にクローズされたプルリクエ�
 
 1. **基本情報取得**: PRの番号、タイトル、クローズ日時、マージ状態を取得
 2. **ファイル存在チェック**: 既にダウンロード済みのファイルがある場合はスキップ
-3. **詳細取得**: スキップされなかったPRのみ、レビューコメントとDiff情報を取得
+3. **詳細取得**: レビューコメントとDiff情報を取得
 4. **ファイル出力**: 収集したデータを構造化して保存
 
 この設計により、APIレート制限を効率的に回避し、処理時間を短縮しています。
@@ -88,7 +88,7 @@ python prcollector/src/main.py \
 
 ### ディレクトリ構造
 
-```
+```text
 pullrequests/
 ├── 2025-09-01/
 │   ├── PR-123-comments.json
@@ -142,30 +142,6 @@ Comment: ここは例外処理を追加したいです
 +        raise ValueError('Data is required')
      return data.upper()
 ```
-```
-
-## 実行例
-
-### 実際の実行例とログ出力
-
-```bash
-$ python prcollector/src/main.py --repo "example/test-repo" --from-date "2025-09-01" --to-date "2025-09-05" --verbose
-
-2025-09-12 14:30:00 - prcollector - INFO - Starting collection for example/test-repo
-2025-09-12 14:30:00 - prcollector - INFO - Period: 2025-09-01 to 2025-09-05
-2025-09-12 14:30:01 - prcollector - INFO - Searching for PRs closed between 2025-09-01 00:00:00+09:00 and 2025-09-05 23:59:59+09:00
-2025-09-12 14:30:01 - prcollector - INFO - Starting PR search...
-2025-09-12 14:30:02 - prcollector - INFO - Found PR #123: Fix data validation
-2025-09-12 14:30:02 - prcollector - INFO - Processing PR #123: Fix data validation
-2025-09-12 14:30:03 - prcollector - INFO - Saved PR #123 data (2 comments)
-2025-09-12 14:30:03 - prcollector - INFO - Found PR #124: Update documentation
-2025-09-12 14:30:03 - prcollector - INFO - No review comments found for PR #124
-2025-09-12 14:30:04 - prcollector - INFO - Found PR #125: Refactor database layer
-2025-09-12 14:30:04 - prcollector - INFO - Processing PR #125: Refactor database layer
-2025-09-12 14:30:05 - prcollector - INFO - Saved PR #125 data (5 comments)
-2025-09-12 14:30:05 - prcollector - INFO - PR search completed. Found 3 matching PRs.
-2025-09-12 14:30:05 - prcollector - INFO - Collection completed. Found 3 PRs, processed 2 PRs with review comments.
-```
 
 ## 技術仕様
 
@@ -193,7 +169,7 @@ $ python prcollector/src/main.py --repo "example/test-repo" --from-date "2025-09
 
 #### 1. 認証エラー
 
-```
+```text
 Error: Failed to access repository owner/repo: 401 {...}
 ```
 
@@ -201,7 +177,7 @@ Error: Failed to access repository owner/repo: 401 {...}
 
 #### 2. レート制限エラー
 
-```
+```text
 Error: 403 API rate limit exceeded
 ```
 
@@ -209,54 +185,8 @@ Error: 403 API rate limit exceeded
 
 #### 3. リポジトリアクセスエラー
 
-```
+```text
 Error: Failed to access repository owner/repo: 404 {...}
 ```
 
 **対処法**: リポジトリ名が正しいか、トークンにそのリポジトリへのアクセス権限があるか確認してください。
-
-## 開発者向け情報
-
-### コード構造
-
-新しいClean Architectureでは以下のように組織化されています：
-
-**Domain Layer**
-- `DateRange`: 日付範囲のValue Object
-- `RepositoryIdentifier`: リポジトリ識別子のValue Object 
-- `ReviewComment`: レビューコメントのValue Object
-- `PullRequestMetadata`: PRメタデータのValue Object
-
-**Application Layer**
-- `PRReviewCollectionService`: メインのビジネスロジック
-
-**Infrastructure Layer**
-- `GitHubRepository`: GitHub API操作
-- `TimezoneConverter`: タイムゾーン変換
-- `JsonOutputFormatter`: JSON出力フォーマット
-- `FileSystemOutputWriter`: ファイルシステム出力
-- `ServiceFactory`: 依存関係の組み立て
-
-**Presentation Layer**
-- `CLIController`: コマンドラインインターフェース
-
-### ログレベル
-
-- `INFO`: 基本的な進行状況
-- `DEBUG`: 詳細なデバッグ情報（`--verbose`で有効）
-- `ERROR`: エラー情報
-- `WARNING`: 警告情報
-
-### 拡張可能な箇所
-
-- 出力フォーマット（JSON以外への対応）
-- フィルタリング条件（特定ユーザーのコメントのみなど）
-- Diff抽出ロジック（コンテキスト行数の変更など）
-
-## ライセンス
-
-このプロジェクトはMITライセンスの下で公開されています。
-
-## 貢献
-
-バグ報告や機能改善の提案を歓迎します。GitHubのIssueまたはPull Requestをご利用ください。
