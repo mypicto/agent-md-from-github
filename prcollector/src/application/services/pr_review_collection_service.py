@@ -59,18 +59,27 @@ class PRReviewCollectionService:
             # Find and process PRs in streaming fashion
             processed_count = 0
             total_found = 0
+            skipped_count = 0
             
-            for pr_metadata in self._github_repository.find_closed_pull_requests_in_range(
+            for basic_info in self._github_repository.find_closed_prs_basic_info(
                 repository_id, 
                 date_range
             ):
                 total_found += 1
-                self._logger.info(f"Found PR #{pr_metadata.number}: {pr_metadata.title}")
+                
+                # Check if files already exist
+                if self._output_writer.file_exists_from_basic_info(basic_info, output_directory):
+                    skipped_count += 1
+                    self._logger.info(f"Skipping PR #{basic_info.number} - files already exist")
+                    continue
+                
+                # Get full PR metadata only if files don't exist
+                pr_metadata = self._github_repository.get_full_pr_metadata(basic_info.number, repository_id)
                 
                 if self._process_single_pr(pr_metadata, output_directory):
                     processed_count += 1
             
-            self._logger.info(f"Collection completed. Found {total_found} PRs, processed {processed_count} PRs with review comments.")
+            self._logger.info(f"Collection completed. Found {total_found} PRs, processed {processed_count} PRs, skipped {skipped_count} PRs.")
             
         except Exception as e:
             raise PRReviewCollectionError(f"Failed to collect review comments: {e}") from e
@@ -83,20 +92,8 @@ class PRReviewCollectionService:
             output_directory: Output directory
             
         Returns:
-            True if PR was processed, False if skipped
+            True if PR was processed, False
         """
-        # Check for idempotency
-        if self._output_writer.file_exists(pr_metadata, output_directory):
-            self._logger.info(f"Skipping PR #{pr_metadata.number} - files already exist")
-            return False
-        
-        # Skip PRs without review comments
-        if not pr_metadata.has_review_comments():
-            self._logger.info(f"No review comments found for PR #{pr_metadata.number}")
-            return False
-        
-        self._logger.info(f"Processing PR #{pr_metadata.number}: {pr_metadata.title}")
-        
         try:
             # Format output content
             comments_content = self._output_formatter.format_comments(pr_metadata)
@@ -111,7 +108,7 @@ class PRReviewCollectionService:
             )
             
             self._logger.info(
-                f"Saved PR #{pr_metadata.number} data ({len(pr_metadata.review_comments)} comments)"
+                f"Saved PR #{pr_metadata.number}: {pr_metadata.title} data ({len(pr_metadata.review_comments)} comments)"
             )
             return True
             

@@ -10,6 +10,7 @@ from prcollector.src.application.services.pr_review_collection_service import PR
 from prcollector.src.domain.date_range import DateRange
 from prcollector.src.domain.repository_identifier import RepositoryIdentifier
 from prcollector.src.domain.pull_request_metadata import PullRequestMetadata
+from prcollector.src.domain.pull_request_basic_info import PullRequestBasicInfo
 from prcollector.src.domain.review_comment import ReviewComment
 
 
@@ -70,14 +71,25 @@ class TestPRReviewCollectionService:
             review_comments=[comment]
         )
 
-        mock_github.find_closed_pull_requests_in_range.return_value = [pr_metadata]
-        mock_writer.file_exists.return_value = False
+        # Mock basic info
+        basic_info = PullRequestBasicInfo(
+            number=1,
+            title="Test PR",
+            closed_at=datetime.now(),
+            is_merged=True
+        )
+
+        mock_github.find_closed_prs_basic_info.return_value = [basic_info]
+        mock_github.get_full_pr_metadata.return_value = pr_metadata
+        mock_writer.file_exists_from_basic_info.return_value = False  # File doesn't exist
+        mock_writer.file_exists.return_value = False  # For _process_single_pr
         mock_formatter.format_comments.return_value = "comments"
         mock_formatter.format_diff_excerpt.return_value = "diff"
 
         service.collect_review_comments(repo_id, date_range, output_dir)
 
-        mock_github.find_closed_pull_requests_in_range.assert_called_once_with(repo_id, date_range)
+        mock_github.find_closed_prs_basic_info.assert_called_once_with(repo_id, date_range)
+        mock_github.get_full_pr_metadata.assert_called_once_with(1, repo_id)
         mock_writer.write_pr_data.assert_called_once()
 
     def test_collect_review_comments_例外発生_PRReviewCollectionErrorが発生する(self):
@@ -99,63 +111,11 @@ class TestPRReviewCollectionService:
         )
         output_dir = Path("test_dir")
 
-        mock_github.find_closed_pull_requests_in_range.side_effect = Exception("Test error")
+        mock_github.find_closed_prs_basic_info.side_effect = Exception("Test error")
 
         from prcollector.src.application.exceptions.pr_review_collection_error import PRReviewCollectionError
         with pytest.raises(PRReviewCollectionError):
             service.collect_review_comments(repo_id, date_range, output_dir)
-
-    def test__process_single_pr_ファイルが存在する_Falseが返される(self):
-        """Test _process_single_pr returns False when file exists."""
-        mock_github = MagicMock()
-        mock_formatter = MagicMock()
-        mock_writer = MagicMock()
-
-        service = PRReviewCollectionService(
-            github_repository=mock_github,
-            output_formatter=mock_formatter,
-            output_writer=mock_writer
-        )
-
-        pr_metadata = PullRequestMetadata(
-            number=1,
-            title="Test PR",
-            closed_at=datetime.now(),
-            is_merged=True,
-            review_comments=[]
-        )
-        output_dir = Path("test_dir")
-
-        mock_writer.file_exists.return_value = True
-
-        result = service._process_single_pr(pr_metadata, output_dir)
-        assert result is False
-
-    def test__process_single_pr_コメントなし_Falseが返される(self):
-        """Test _process_single_pr returns False when no comments."""
-        mock_github = MagicMock()
-        mock_formatter = MagicMock()
-        mock_writer = MagicMock()
-
-        service = PRReviewCollectionService(
-            github_repository=mock_github,
-            output_formatter=mock_formatter,
-            output_writer=mock_writer
-        )
-
-        pr_metadata = PullRequestMetadata(
-            number=1,
-            title="Test PR",
-            closed_at=datetime.now(),
-            is_merged=True,
-            review_comments=[]
-        )
-        output_dir = Path("test_dir")
-
-        mock_writer.file_exists.return_value = False
-
-        result = service._process_single_pr(pr_metadata, output_dir)
-        assert result is False
 
     def test__process_single_pr_正常処理_Trueが返される(self):
         """Test _process_single_pr returns True on successful processing."""
@@ -188,7 +148,6 @@ class TestPRReviewCollectionService:
         )
         output_dir = Path("test_dir")
 
-        mock_writer.file_exists.return_value = False
         mock_formatter.format_comments.return_value = "comments"
         mock_formatter.format_diff_excerpt.return_value = "diff"
 

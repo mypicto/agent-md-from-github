@@ -2,7 +2,6 @@
 Tests for PRReviewCollectionError.
 """
 
-import pytest
 from prcollector.src.application.exceptions.pr_review_collection_error import PRReviewCollectionError
 
 

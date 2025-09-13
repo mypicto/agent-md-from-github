@@ -2,7 +2,6 @@
 Tests for OutputFormatterInterface.
 """
 
-import pytest
 from prcollector.src.domain.interfaces.output_formatter_interface import OutputFormatterInterface
 
 

@@ -18,7 +18,3 @@ class PullRequestMetadata:
     closed_at: datetime
     is_merged: bool
     review_comments: List[ReviewComment]
-    
-    def has_review_comments(self) -> bool:
-        """Check if PR has any review comments."""
-        return len(self.review_comments) > 0

@@ -4,8 +4,8 @@ File system output writer implementation.
 
 from pathlib import Path
 
-from ..domain.interfaces.output_writer_interface import OutputWriterInterface
 from ..domain.pull_request_metadata import PullRequestMetadata
+from ..domain.pull_request_basic_info import PullRequestBasicInfo
 
 
 class FileSystemOutputWriter:
@@ -32,11 +32,11 @@ class FileSystemOutputWriter:
         self._write_text_file(comments_file, comments_content)
         self._write_text_file(diff_file, diff_content)
     
-    def file_exists(self, pr_metadata: PullRequestMetadata, output_directory: Path) -> bool:
-        """Check if PR files already exist (for idempotency)."""
-        date_folder = pr_metadata.closed_at.strftime("%Y-%m-%d")
+    def file_exists_from_basic_info(self, basic_info: PullRequestBasicInfo, output_directory: Path) -> bool:
+        """Check if PR files already exist using basic info."""
+        date_folder = basic_info.closed_at.strftime("%Y-%m-%d")
         output_path = output_directory / date_folder
-        comments_file = output_path / f"PR-{pr_metadata.number}-comments.json"
+        comments_file = output_path / f"PR-{basic_info.number}-comments.json"
         return comments_file.exists()
     
     def _write_text_file(self, file_path: Path, content: str) -> None:

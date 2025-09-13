@@ -5,7 +5,6 @@ JSON output formatter implementation.
 import json
 from typing import Dict
 
-from ..domain.interfaces.output_formatter_interface import OutputFormatterInterface
 from ..domain.pull_request_metadata import PullRequestMetadata
 from ..domain.review_comment import ReviewComment
 

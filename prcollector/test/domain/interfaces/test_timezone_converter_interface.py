@@ -2,7 +2,6 @@
 Tests for TimezoneConverterInterface.
 """
 
-import pytest
 from prcollector.src.domain.interfaces.timezone_converter_interface import TimezoneConverterInterface
 
 

@@ -2,7 +2,6 @@
 Tests for JsonOutputFormatter.
 """
 
-import pytest
 import json
 from datetime import datetime
 from prcollector.src.infrastructure.json_output_formatter import JsonOutputFormatter

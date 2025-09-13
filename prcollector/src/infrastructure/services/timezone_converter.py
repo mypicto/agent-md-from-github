@@ -6,8 +6,6 @@ from datetime import datetime
 
 import pytz
 
-from ...domain.interfaces.timezone_converter_interface import TimezoneConverterInterface
-
 
 class TimezoneConverter:
     """Timezone conversion service implementation."""

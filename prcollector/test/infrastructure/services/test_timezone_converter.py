@@ -2,7 +2,6 @@
 Tests for TimezoneConverter.
 """
 
-import pytest
 from datetime import datetime
 import pytz
 from prcollector.src.infrastructure.services.timezone_converter import TimezoneConverter

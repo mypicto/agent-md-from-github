@@ -6,6 +6,7 @@ from pathlib import Path
 from typing import Protocol
 
 from ..pull_request_metadata import PullRequestMetadata
+from ..pull_request_basic_info import PullRequestBasicInfo
 
 
 class OutputWriterInterface(Protocol):
@@ -21,6 +22,6 @@ class OutputWriterInterface(Protocol):
         """Write PR data to storage."""
         ...
     
-    def file_exists(self, pr_metadata: PullRequestMetadata, output_directory: Path) -> bool:
-        """Check if PR files already exist (for idempotency)."""
+    def file_exists_from_basic_info(self, basic_info: PullRequestBasicInfo, output_directory: Path) -> bool:
+        """Check if PR files already exist using basic info."""
         ...

@@ -2,7 +2,6 @@
 Tests for ServiceFactory.
 """
 
-import pytest
 import logging
 from unittest.mock import patch, MagicMock
 from prcollector.src.infrastructure.service_factory import ServiceFactory

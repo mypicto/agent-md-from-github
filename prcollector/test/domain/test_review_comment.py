@@ -2,7 +2,6 @@
 Tests for ReviewComment.
 """
 
-import pytest
 from datetime import datetime
 from prcollector.src.domain.review_comment import ReviewComment
 

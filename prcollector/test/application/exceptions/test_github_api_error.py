@@ -2,7 +2,6 @@
 Tests for GitHubApiError.
 """
 
-import pytest
 from prcollector.src.application.exceptions.github_api_error import GitHubApiError
 
 

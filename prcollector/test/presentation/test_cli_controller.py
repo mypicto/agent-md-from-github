@@ -5,7 +5,6 @@ Tests for CLIController.
 import argparse
 import pytest
 from datetime import datetime
-from pathlib import Path
 from unittest.mock import patch, MagicMock
 from prcollector.src.presentation.cli_controller import CLIController, parse_date
 
