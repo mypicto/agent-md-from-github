@@ -23,7 +23,11 @@ GitHubリポジトリの指定期間内にクローズされたプルリクエ�
 
 ## 必要な権限
 
-### Fine-grained personal access token （あなたがリポジトリのオーナーの場合）
+### Personal Access Tokenの種類
+
+#### Fine-grained personal access token（推奨）
+
+あなたがリポジトリーの owner である必要があります。
 
 以下の権限が必要です（動作未確認）：
 
@@ -32,27 +36,60 @@ GitHubリポジトリの指定期間内にクローズされたプルリクエ�
 - **Metadata**: Read
 - **Issues**: Read
 
-### Classic personal access token
+#### Classic personal access token
 
 以下の権限が必要です：
 
 - **repo**（Full control of private repositories）: Read and write
 
-## インストール
+### トークンの設定方法
 
-### 1. 依存関係のインストール
+#### 方法1: セキュアなキーリング保存（推奨）
 
 ```bash
-pip install -r requirements.txt
+# 初回のみ: トークンをシステムのキーリングに保存
+python prcollector/src/main.py auth --store-token "your_github_token_here"
 ```
 
-### 2. GitHubトークンの設定
+**利点:**
+
+- OSのネイティブなクレデンシャルストレージを使用
+- プロセスメモリ上に平文のトークンが残らない
+- 一度保存すれば毎回入力する必要がない
+
+#### 方法2: 環境変数設定
 
 ```bash
-# 環境変数として設定（推奨）
-export GITHUB_TOKEN="your_github_token_here"
+# シェル設定ファイル（.bashrc, .zshrcなど）に追加
+echo 'export GITHUB_TOKEN="your_github_token_here"' >> ~/.zshrc
+source ~/.zshrc
 
-# または実行時に--tokenオプションで指定
+# またはセッションごとに設定
+export GITHUB_TOKEN="your_github_token_here"
+```
+
+#### 方法3: コマンドライン引数指定
+
+```bash
+# 実行時に直接指定
+python prcollector/src/main.py collector --repo "octo-org/example" --from-date "2025-09-01" --to-date "2025-09-10" --token "your_github_token_here"
+```
+
+### トークンの優先順位
+
+トークンは以下の優先順位で参照されます：
+
+1. **コマンドライン引数** (`--token`) - 最も優先度が高い
+2. **システムキーリング** (TokenManager) - `auth --store-token`で保存されたトークン
+3. **環境変数** (`GITHUB_TOKEN`) - `export GITHUB_TOKEN="your_token"`で設定されたトークン
+
+### トークンの管理
+
+#### 保存されたトークンの削除
+
+```bash
+# キーリングからトークンを削除
+python prcollector/src/main.py auth --clear-token
 ```
 
 ## 使用方法
@@ -60,18 +97,14 @@ export GITHUB_TOKEN="your_github_token_here"
 ### 基本的な使用例
 
 ```bash
-# 環境変数でトークンを設定している場合
-python prcollector/src/main.py --repo "octo-org/example" --from-date "2025-09-01" --to-date "2025-09-10"
-
-# トークンを直接指定する場合
-python prcollector/src/main.py --repo "octo-org/example" --from-date "2025-09-01" --to-date "2025-09-10" --token "your_token"
+python prcollector/src/main.py collector --repo "octo-org/example" --from-date "2025-09-01" --to-date "2025-09-10"
 ```
 
 ### 高度な使用例
 
 ```bash
 # 出力ディレクトリとタイムゾーンを指定
-python prcollector/src/main.py \
+python prcollector/src/main.py collector \
   --repo "owner/repository" \
   --from-date "2025-08-01" \
   --to-date "2025-08-31" \
@@ -82,6 +115,13 @@ python prcollector/src/main.py \
 
 ### コマンドラインオプション
 
+#### 利用可能なサブコマンド
+
+- `collector`: PRレビューコメントの収集（デフォルトのメイン機能）
+- `auth`: GitHub認証トークンの管理
+
+#### collectorコマンドのオプション
+
 | オプション | 必須 | 説明 | デフォルト値 |
 |-----------|------|------|-------------|
 | `--repo` | ✅ | リポジトリ名（`owner/repo`形式） | - |
@@ -89,8 +129,15 @@ python prcollector/src/main.py \
 | `--to-date` | ✅ | 終了日（`YYYY-MM-DD`形式、含む） | - |
 | `--output-dir` | ❌ | 出力ディレクトリ | `pullrequests` |
 | `--timezone` | ❌ | タイムゾーン | `Asia/Tokyo` |
-| `--token` | ❌ | GitHubトークン | 環境変数`GITHUB_TOKEN` |
+| `--token` | ❌ | GitHubトークン | 環境変数`GITHUB_TOKEN`またはキーリング |
 | `--verbose` | ❌ | 詳細ログ出力 | False |
+
+#### authコマンドのオプション
+
+| オプション | 必須 | 説明 |
+|-----------|------|------|
+| `--store-token` | ✅ | GitHubトークンをキーリングに保存 |
+| `--clear-token` | ❌ | 保存されたトークンを削除 |
 
 ## 出力仕様
 
