@@ -1,202 +1,134 @@
-# GitHub PR Review Comments Collector and Utilities
+# GitHub PR Review Comments Collector
 
-GitHubリポジトリの指定期間内にクローズされたプルリクエストから、**コードレビューコメント**（inline review comments）と**関連するDiff抜粋**を収集するPythonスクリプトです。また、収集したデータの管理ユーティリティも提供します。
+GitHubリポジトリのプルリクエストからレビューコメントとDiffを効率的に収集するPythonツール。
+収集したデータから AI agent が参照する `AGENT.md` を生成することを目的としています。
 
-## 特徴
+## 🚀 概要
 
-- ✅ **期間指定**: 指定した日付範囲でクローズされたPRを対象
-- ✅ **タイムゾーン対応**: Asia/Tokyo基準での日付判定
-- ✅ **レビューコメント特化**: インラインレビューコメントのみを収集（通常のコメントは除外）
-- ✅ **冪等性**: 既存ファイルがある場合はスキップ
-- ✅ **効率的なAPI利用**: 基本情報取得と詳細取得を分離し、不要なAPI呼び出しを削減
-- ✅ **適切な権限管理**: Fine-grained personal access tokenに対応
-- ✅ **構造化出力**: JSON + Patchファイル形式
-- ✅ **データ管理**: 収集したデータの欠如チェック機能
+このツールは、指定したGitHubリポジトリのクローズされたプルリクエストから、コードレビューコメント（inline comments）と関連するDiff抜粋を自動収集します。収集したデータを構造化して保存し、後続の分析やドキュメント化を支援します。
 
-## 処理フロー
+主な機能：
 
-1. **基本情報取得**: PRの番号、タイトル、クローズ日時、マージ状態を取得
-2. **ファイル存在チェック**: 既にダウンロード済みのファイルがある場合はスキップ
-3. **詳細取得**: レビューコメントとDiff情報を取得
-4. **ファイル出力**: 収集したデータを構造化して保存
+- 指定期間内のクローズ済みPRのレビューコメント収集
+- 収集データの管理ユーティリティ
 
-この設計により、APIレート制限を効率的に回避し、処理時間を短縮しています。
+## 📋 前提条件
 
-## 必要な権限
+### Python環境
 
-### Personal Access Tokenの種類
+- Python 3.8以上
+- 必要なパッケージ：`pip install -r requirements.txt`
 
-#### Fine-grained personal access token（推奨）
+### GitHubアクセス権限
 
-あなたがリポジトリーの owner である必要があります。
+以下のいずれかのPersonal Access Tokenが必要です：
 
-以下の権限が必要です（動作未確認）：
+#### Fine-grained Token（推奨）
 
-- **Pull requests**: Read
-- **Contents**: Read  
-- **Metadata**: Read
-- **Issues**: Read
+- リポジトリのコラボレーターは対象外
+- 必要な権限：
+  - Pull requests: Read
+  - Contents: Read
+  - Metadata: Read
+  - Issues: Read
 
-#### Classic personal access token
+#### Classic Token
 
-以下の権限が必要です：
+- 権限：`repo`（プライベートリポジトリのフルコントロール）
 
-- **repo**（Full control of private repositories）: Read and write
+## 🔐 認証設定
 
-### トークンの設定方法
-
-#### 方法1: セキュアなキーリング保存（推奨）
+### トークンの保存（推奨）
 
 ```bash
-# 初回のみ: トークンをシステムのキーリングに保存
 python scripts/src/auth.py --store-token "your_github_token_here"
 ```
 
-**利点:**
-
-- OSのネイティブなクレデンシャルストレージを使用
-- プロセスメモリ上に平文のトークンが残らない
-- 一度保存すれば毎回入力する必要がない
-
-#### 方法2: 環境変数設定
+### 一時的な使用
 
 ```bash
-# シェル設定ファイル（.bashrc, .zshrcなど）に追加
-echo 'export GITHUB_TOKEN="your_github_token_here"' >> ~/.zshrc
-source ~/.zshrc
-
-# またはセッションごとに設定
 export GITHUB_TOKEN="your_github_token_here"
+# または
+python scripts/src/fetch.py --token "your_github_token_here"
 ```
 
-#### 方法3: コマンドライン引数指定
+### トークンの削除
 
 ```bash
-# 実行時に直接指定
-python scripts/src/fetch.py --repo "octo-org/example" --from-date "2025-09-01" --to-date "2025-09-10" --token "your_github_token_here"
-```
-
-### トークンの優先順位
-
-トークンは以下の優先順位で参照されます：
-
-1. **コマンドライン引数** (`--token`) - 最も優先度が高い
-2. **システムキーリング** (TokenManager) - `auth --store-token`で保存されたトークン
-3. **環境変数** (`GITHUB_TOKEN`) - `export GITHUB_TOKEN="your_token"`で設定されたトークン
-
-### トークンの管理
-
-#### 保存されたトークンの削除
-
-```bash
-# キーリングからトークンを削除
 python scripts/src/auth.py --clear-token
 ```
 
-## 使用方法
+## 🛠️ クイックスタート
+
+### 基本的な収集
+
+```bash
+python scripts/src/fetch.py --repo "owner/repository" --from-date "2025-09-01" --to-date "2025-09-10"
+```
+
+### サマリーデータ欠如チェック
+
+```bash
+python scripts/src/list_missing_summaries.py --repo "owner/repository"
+```
+
+## 📖 詳細な使用方法
 
 ### 利用可能なコマンド
 
-- `fetch.py`: PRレビューコメントの収集（メイン機能）
-- `list_missing_summaries.py`: 収集したデータからサマリーファイルが欠如しているPRをリストアップ
-- `auth.py`: GitHub認証トークンの管理
+| コマンド | 説明 |
+|----------|------|
+| `fetch.py` | PRレビューコメントの収集 |
+| `list_missing_summaries.py` | サマリーデータの欠如チェック |
+| `auth.py` | GitHubトークンの管理 |
 
-### 基本的な使用例
+### fetch.py オプション
 
-#### PRレビューコメントの収集
-
-```bash
-python scripts/src/fetch.py --repo "octo-org/example" --from-date "2025-09-01" --to-date "2025-09-10"
-```
-
-#### サマリーファイルの欠如チェック
-
-```bash
-python list_missing_summaries.py --repo "octo-org/example" --output-dir "pullrequests"
-```
-
-### 高度な使用例
-
-#### PRレビューコメントの収集（詳細指定）
-
-```bash
-# 出力ディレクトリとタイムゾーンを指定
-python scripts/src/fetch.py \
-  --repo "owner/repository" \
-  --from-date "2025-08-01" \
-  --to-date "2025-08-31" \
-  --output-dir "my_output" \
-  --timezone "UTC" \
-  --verbose
-```
-
-#### サマリーファイルの欠如チェック（詳細指定）
-
-```bash
-# 出力ディレクトリを指定
-python list_missing_summaries.py \
-  --repo "owner/repository" \
-  --output-dir "my_output"
-```
-
-### コマンドラインオプション
-
-#### fetch.pyのオプション
-
-| オプション | 必須 | 説明 | デフォルト値 |
-|-----------|------|------|-------------|
+| オプション | 必須 | 説明 | デフォルト |
+|-----------|------|------|-----------|
 | `--repo` | ✅ | リポジトリ名（`owner/repo`形式） | - |
-| `--from-date` | ✅ | 開始日（`YYYY-MM-DD`形式、含む） | - |
-| `--to-date` | ✅ | 終了日（`YYYY-MM-DD`形式、含む） | - |
+| `--from-date` | ✅ | 開始日（`YYYY-MM-DD`） | - |
+| `--to-date` | ✅ | 終了日（`YYYY-MM-DD`） | - |
 | `--output-dir` | ❌ | 出力ディレクトリ | `pullrequests` |
 | `--timezone` | ❌ | タイムゾーン | `Asia/Tokyo` |
-| `--token` | ❌ | GitHubトークン | 環境変数`GITHUB_TOKEN`またはキーリング |
-| `--verbose` | ❌ | 詳細ログ出力 | False |
+| `--token` | ❌ | GitHubトークン | 環境変数/キーリング |
+| `--verbose` | ❌ | 詳細出力 | `False` |
 
-#### auth.pyのオプション
+### list_missing_summaries.py オプション
 
-| オプション | 必須 | 説明 |
-|-----------|------|------|
-| `--store-token` | ✅ | GitHubトークンをキーリングに保存 |
-| `--clear-token` | ❌ | 保存されたトークンを削除 |
-
-#### list_missing_summaries.pyのオプション
-
-| オプション | 必須 | 説明 | デフォルト値 |
-|-----------|------|------|-------------|
+| オプション | 必須 | 説明 | デフォルト |
+|-----------|------|------|-----------|
 | `--repo` | ✅ | リポジトリ名（`owner/repo`形式） | - |
 | `--output-dir` | ❌ | 出力ディレクトリ | `pullrequests` |
 
-## 出力仕様
+### auth.py オプション
+
+| オプション | 説明 |
+|-----------|------|
+| `--store-token` | トークンをキーリングに保存 |
+| `--clear-token` | 保存トークンを削除 |
+
+## 📁 出力形式
 
 ### ディレクトリ構造
 
 ```text
 pullrequests/
-├── owner1/
-│   ├── repo1/
-│   │   ├── 2025-09-01/
-│   │   │   ├── PR-123-comments.json
-│   │   │   ├── PR-123-diff.patch
-│   │   │   └── PR-123-summary.md
-│   │   ├── 2025-09-02/
-│   │   │   ├── PR-456-comments.json
-│   │   │   ├── PR-456-diff.patch
-│   │   │   └── PR-456-summary.md
-│   ├── repo2/
-│   │   ├── 2025-09-03/
-│   │   │   ├── PR-789-comments.json
-│   │   │   ├── PR-789-diff.patch
-│   │   │   └── PR-789-summary.md
-├── owner2/
-│   └── repo3/
-│       ├── 2025-09-04/
-│       │   ├── PR-101-comments.json
-│       │   ├── PR-101-diff.patch
-│       │   └── PR-101-summary.md
+├── owner/
+│   └── repository/
+│       ├── 2025-09-01/
+│       │   ├── PR-123-comments.json
+│       │   ├── PR-123-diff.patch
+│       │   └── PR-123-summary.md
+│       └── 2025-09-02/
+│           ├── PR-456-comments.json
+│           ├── PR-456-diff.patch
+│           └── PR-456-summary.md
 ```
 
-### JSON出力形式（`PR-{number}-comments.json`）
+### JSONデータ形式
+
+各PRのコメントデータは以下の構造で保存されます：
 
 ```json
 {
@@ -218,70 +150,17 @@ pullrequests/
 }
 ```
 
-### Diff出力形式（`PR-{number}-diff.patch`）
+## ⚠️ トラブルシューティング
 
-```markdown
-# PR #123: Fix data validation
-# Closed at: 2025-09-01 12:34:56+00:00
-# Merged: True
+### よくあるエラー
 
-## File: src/app.py
+| エラーコード | 原因 | 対処法 |
+|-------------|------|--------|
+| 401 | 認証失敗 | トークンの権限を確認 |
+| 403 | レート制限超過 | 時間を置いて再試行 |
+| 404 | リポジトリアクセス不可 | リポジトリ名と権限を確認 |
 
-### Comment by reviewer1 at position 42
-Comment: ここは例外処理を追加したいです
+### 追加のヒント
 
-```diff
-@@ -40,6 +40,9 @@
- def process_data(data):
-+    if not data:
-+        raise ValueError('Data is required')
-     return data.upper()
-```
+- タイムゾーン設定で日付フィルタリングを調整
 
-## 技術仕様
-
-### 対象となるPR
-
-- **クローズ済み**: `state='closed'`のPR
-- **マージ・非マージ両方**: `merged=true`と`merged=false`の両方
-- **期間内**: `closed_at`が指定期間内（タイムゾーン考慮）
-
-### 対象となるコメント
-
-- **レビューコメントのみ**: `PullRequest.get_review_comments()`で取得
-- **インラインコメント**: コードの特定行に対するコメント
-- **除外**: 通常のPRコメント（`PullRequest.get_issue_comments()`）
-
-### 冪等性の実装
-
-- `PR-{number}-comments.json`ファイルの存在をチェック
-- 既存ファイルがある場合はPR全体をスキップ
-- 部分的な実行の再開が可能
-
-## エラーハンドリング
-
-### よくあるエラーと対処法
-
-#### 1. 認証エラー
-
-```text
-Error: Failed to access repository owner/repo: 401 {...}
-```
-
-**対処法**: GitHubトークンの権限を確認し、必要な権限が付与されているか確認してください。
-
-#### 2. レート制限エラー
-
-```text
-Error: 403 API rate limit exceeded
-```
-
-**対処法**: GitHub APIのレート制限に達しています。しばらく待ってから再実行してください。
-
-#### 3. リポジトリアクセスエラー
-
-```text
-Error: Failed to access repository owner/repo: 404 {...}
-```
-
-**対処法**: リポジトリ名が正しいか、トークンにそのリポジトリへのアクセス権限があるか確認してください。
