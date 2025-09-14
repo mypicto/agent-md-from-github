@@ -69,7 +69,7 @@ This project follows the **Clean Architecture** principles, inspired by Robert C
 
 4. **Presentation Layer** (`src/presentation/`):
    - Contains controllers and UI-related code.
-   - Examples: `CLIController`, `AuthController`, `FetchController`.
+   - Examples: `AuthController`, `FetchController`.
    - **Responsibilities**: Handle user input, format output, and interact with the application layer.
 
 ### Dependency Direction

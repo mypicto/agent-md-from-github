@@ -35,21 +35,11 @@ from .infrastructure.service_factory import ServiceFactory
 from .infrastructure.repositories import GitHubRepository
 from .infrastructure.services import TimezoneConverter
 
-# Presentation layer
-from .presentation.cli_controller import CLIController
-
 
 __version__ = "2.0.0"
 
-def main():
-    """Main entry point for CLI application."""
-    cli = CLIController()
-    cli.run()
-
 __all__ = [
     # Main entry points
-    "main",
-    "CLIController",
     "ServiceFactory",
     
     # Application layer
