@@ -48,7 +48,7 @@ GitHubリポジトリの指定期間内にクローズされたプルリクエ�
 
 ```bash
 # 初回のみ: トークンをシステムのキーリングに保存
-python scripts/src/main.py auth --store-token "your_github_token_here"
+python scripts/src/auth.py --store-token "your_github_token_here"
 ```
 
 **利点:**
@@ -72,7 +72,7 @@ export GITHUB_TOKEN="your_github_token_here"
 
 ```bash
 # 実行時に直接指定
-python scripts/src/main.py collector --repo "octo-org/example" --from-date "2025-09-01" --to-date "2025-09-10" --token "your_github_token_here"
+python scripts/src/fetch.py --repo "octo-org/example" --from-date "2025-09-01" --to-date "2025-09-10" --token "your_github_token_here"
 ```
 
 ### トークンの優先順位
@@ -89,7 +89,7 @@ python scripts/src/main.py collector --repo "octo-org/example" --from-date "2025
 
 ```bash
 # キーリングからトークンを削除
-python scripts/src/main.py auth --clear-token
+python scripts/src/auth.py --clear-token
 ```
 
 ## 使用方法
@@ -97,14 +97,14 @@ python scripts/src/main.py auth --clear-token
 ### 基本的な使用例
 
 ```bash
-python scripts/src/main.py collector --repo "octo-org/example" --from-date "2025-09-01" --to-date "2025-09-10"
+python scripts/src/fetch.py --repo "octo-org/example" --from-date "2025-09-01" --to-date "2025-09-10"
 ```
 
 ### 高度な使用例
 
 ```bash
 # 出力ディレクトリとタイムゾーンを指定
-python scripts/src/main.py collector \
+python scripts/src/fetch.py \
   --repo "owner/repository" \
   --from-date "2025-08-01" \
   --to-date "2025-08-31" \
@@ -115,12 +115,12 @@ python scripts/src/main.py collector \
 
 ### コマンドラインオプション
 
-#### 利用可能なサブコマンド
+#### 利用可能なコマンド
 
-- `collector`: PRレビューコメントの収集（デフォルトのメイン機能）
-- `auth`: GitHub認証トークンの管理
+- `fetch.py`: PRレビューコメントの収集（メイン機能）
+- `auth.py`: GitHub認証トークンの管理
 
-#### collectorコマンドのオプション
+#### fetch.pyのオプション
 
 | オプション | 必須 | 説明 | デフォルト値 |
 |-----------|------|------|-------------|
@@ -132,7 +132,7 @@ python scripts/src/main.py collector \
 | `--token` | ❌ | GitHubトークン | 環境変数`GITHUB_TOKEN`またはキーリング |
 | `--verbose` | ❌ | 詳細ログ出力 | False |
 
-#### authコマンドのオプション
+#### auth.pyのオプション
 
 | オプション | 必須 | 説明 |
 |-----------|------|------|

@@ -33,6 +33,10 @@
 * As Kent Beck and Martin Fowler note, remove redundant comments that merely restate the code itself.
 * As Martin Fowler advises in *Refactoring*, don't hide poor readability with comments—extract logic and give it meaningful names.
 
+## Testing
+
+* Test method names should be in Japanese and follow the format MethodName_StateUnderTest_ExpectedBehavior.
+
 ## Code Review
 
 * Be mindful of whether readability can be improved through better naming.
