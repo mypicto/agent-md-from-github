@@ -48,7 +48,7 @@ GitHubリポジトリの指定期間内にクローズされたプルリクエ�
 
 ```bash
 # 初回のみ: トークンをシステムのキーリングに保存
-python prcollector/src/main.py auth --store-token "your_github_token_here"
+python scripts/src/main.py auth --store-token "your_github_token_here"
 ```
 
 **利点:**
@@ -72,7 +72,7 @@ export GITHUB_TOKEN="your_github_token_here"
 
 ```bash
 # 実行時に直接指定
-python prcollector/src/main.py collector --repo "octo-org/example" --from-date "2025-09-01" --to-date "2025-09-10" --token "your_github_token_here"
+python scripts/src/main.py collector --repo "octo-org/example" --from-date "2025-09-01" --to-date "2025-09-10" --token "your_github_token_here"
 ```
 
 ### トークンの優先順位
@@ -89,7 +89,7 @@ python prcollector/src/main.py collector --repo "octo-org/example" --from-date "
 
 ```bash
 # キーリングからトークンを削除
-python prcollector/src/main.py auth --clear-token
+python scripts/src/main.py auth --clear-token
 ```
 
 ## 使用方法
@@ -97,14 +97,14 @@ python prcollector/src/main.py auth --clear-token
 ### 基本的な使用例
 
 ```bash
-python prcollector/src/main.py collector --repo "octo-org/example" --from-date "2025-09-01" --to-date "2025-09-10"
+python scripts/src/main.py collector --repo "octo-org/example" --from-date "2025-09-01" --to-date "2025-09-10"
 ```
 
 ### 高度な使用例
 
 ```bash
 # 出力ディレクトリとタイムゾーンを指定
-python prcollector/src/main.py collector \
+python scripts/src/main.py collector \
   --repo "owner/repository" \
   --from-date "2025-08-01" \
   --to-date "2025-08-31" \
