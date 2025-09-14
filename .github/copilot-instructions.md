@@ -44,3 +44,51 @@
 * Warn about fields that may be referenced while uninitialized.
 * Warn about potential memory leaks.
 * When proposing improvements, allow interface and structural changes only for the objects under review and new objects.
+
+## Project Architecture Overview
+
+This project follows the **Clean Architecture** principles, inspired by Robert C. Martin's guidelines, to ensure separation of concerns, testability, and maintainability. The architecture is divided into four main layers, each with specific responsibilities. New team members should familiarize themselves with this structure to contribute effectively.
+
+### Layer Structure
+
+1. **Domain Layer** (`src/domain/`):
+   - Contains the core business logic, entities, value objects, and interfaces.
+   - Examples: `DateRange`, `PullRequestMetadata`, `RepositoryIdentifier`, and interfaces like `GitHubRepositoryInterface`.
+   - This layer is independent of external frameworks and should not depend on other layers.
+   - **Responsibilities**: Define business rules, data structures, and contracts (interfaces) for external dependencies.
+
+2. **Application Layer** (`src/application/`):
+   - Contains use cases and application services that orchestrate domain objects.
+   - Examples: Services for PR review collection, exceptions handling.
+   - **Responsibilities**: Implement business workflows, handle application-specific logic, and coordinate between domain and infrastructure layers.
+
+3. **Infrastructure Layer** (`src/infrastructure/`):
+   - Contains implementations of interfaces defined in the domain layer.
+   - Examples: `FileSystemOutputWriter`, `JsonOutputFormatter`, repository implementations.
+   - **Responsibilities**: Handle external concerns like file I/O, API calls, databases, and third-party services.
+
+4. **Presentation Layer** (`src/presentation/`):
+   - Contains controllers and UI-related code.
+   - Examples: `CLIController`, `AuthController`, `FetchController`.
+   - **Responsibilities**: Handle user input, format output, and interact with the application layer.
+
+### Dependency Direction
+
+- Dependencies flow inward: Presentation → Application → Domain ← Infrastructure.
+- The Domain layer defines interfaces that Infrastructure implements (Dependency Inversion Principle).
+- No layer should depend on layers outward; use dependency injection for cross-layer communication.
+
+### Testing Structure
+
+- Tests are organized mirroring the source structure: `test/domain/`, `test/application/`, `test/infrastructure/`, `test/presentation/`.
+
+### Guidelines for New Team Members
+
+- **Start with Domain**: When adding new features, begin by defining domain entities and interfaces. This ensures the core logic is solid and testable.
+- **Respect Layer Boundaries**: Do not introduce dependencies that violate the layer structure. For example, avoid importing infrastructure code directly into domain classes.
+- **Use Interfaces**: Always define interfaces in the domain layer for external dependencies, and implement them in infrastructure.
+- **Dependency Injection**: Use dependency injection (e.g., via `ServiceFactory`) to provide implementations to higher layers.
+- **Keep It Simple**: Follow KISS and DRY principles; avoid over-engineering.
+- **Test Early**: Write tests alongside code, especially for domain logic, to validate behavior.
+- **Code Reviews**: Pay attention to whether new code adheres to the architecture and principles outlined here.
+
