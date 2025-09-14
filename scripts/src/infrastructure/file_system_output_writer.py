@@ -6,6 +6,7 @@ from pathlib import Path
 
 from ..domain.pull_request_metadata import PullRequestMetadata
 from ..domain.pull_request_basic_info import PullRequestBasicInfo
+from .pull_request_file_path_resolver import PullRequestFilePathResolver
 
 
 class FileSystemOutputWriter:
@@ -19,26 +20,24 @@ class FileSystemOutputWriter:
         output_directory: Path
     ) -> None:
         """Write PR data to file system."""
-        # Create repository-based directory structure
-        date_folder = pr_metadata.closed_at.strftime("%Y-%m-%d")
-        output_path = output_directory / pr_metadata.repository_id.owner / pr_metadata.repository_id.name / date_folder
-        output_path.mkdir(parents=True, exist_ok=True)
+        # Get directory and file paths
+        fileResolver = PullRequestFilePathResolver(output_directory, pr_metadata.repository_id, pr_metadata.closed_at, pr_metadata.number)
         
-        # Define file paths
-        comments_file = output_path / f"PR-{pr_metadata.number}-comments.json"
-        diff_file = output_path / f"PR-{pr_metadata.number}-diff.patch"
+        # Create directory if it doesn't exist
+        pr_directory = fileResolver.get_pr_directory()
+        pr_directory.mkdir(parents=True, exist_ok=True)
         
         # Write files
+        comments_file = fileResolver.get_comments_file_path()
         self._write_text_file(comments_file, comments_content)
+        diff_file = fileResolver.get_diff_file_path()
         self._write_text_file(diff_file, diff_content)
     
     def file_exists_from_basic_info(self, basic_info: PullRequestBasicInfo, output_directory: Path) -> bool:
         """Check if PR files already exist using basic info."""
-        date_folder = basic_info.closed_at.strftime("%Y-%m-%d")
-        output_path = output_directory / basic_info.repository_id.owner / basic_info.repository_id.name / date_folder
-        comments_file = output_path / f"PR-{basic_info.number}-comments.json"
-        return comments_file.exists()
-    
+        fileResolver = PullRequestFilePathResolver(output_directory, basic_info.repository_id, basic_info.closed_at, basic_info.number)
+        return fileResolver.file_exists()
+
     def _write_text_file(self, file_path: Path, content: str) -> None:
         """Write text content to file."""
         with open(file_path, 'w', encoding='utf-8') as f:
