@@ -22,6 +22,6 @@ class OutputWriterInterface(Protocol):
         """Write PR data to storage."""
         ...
     
-    def file_exists_from_basic_info(self, basic_info: PullRequestBasicInfo, output_directory: Path) -> bool:
+    def exists_file_from_basic_info(self, basic_info: PullRequestBasicInfo, output_directory: Path) -> bool:
         """Check if PR files already exist using basic info."""
         ...

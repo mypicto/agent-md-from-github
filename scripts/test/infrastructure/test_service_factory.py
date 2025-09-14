@@ -62,3 +62,19 @@ class TestServiceFactory:
         logger = ServiceFactory.setup_logging(verbose=False)
         root_logger = logging.getLogger()
         assert root_logger.level == logging.INFO
+
+    def test_create_missing_summaries_service_正常作成_サービスが作成される(self):
+        """Test create_missing_summaries_service creates service correctly."""
+        with patch('scripts.src.infrastructure.service_factory.PullRequestFileSetRepository') as mock_repo_class:
+            with patch('scripts.src.infrastructure.service_factory.MissingSummariesService') as mock_service_class:
+                mock_repo_instance = MagicMock()
+                mock_repo_class.return_value = mock_repo_instance
+
+                mock_service_instance = MagicMock()
+                mock_service_class.return_value = mock_service_instance
+
+                service = ServiceFactory.create_missing_summaries_service()
+
+                assert service == mock_service_instance
+                mock_repo_class.assert_called_once()
+                mock_service_class.assert_called_once_with(mock_repo_instance)

@@ -68,7 +68,7 @@ class PRReviewCollectionService:
                 total_found += 1
                 
                 # Check if files already exist
-                if self._output_writer.file_exists_from_basic_info(basic_info, output_directory):
+                if self._output_writer.exists_file_from_basic_info(basic_info, output_directory):
                     skipped_count += 1
                     self._logger.info(f"Skipping PR #{basic_info.number} - files already exist")
                     continue

@@ -83,8 +83,8 @@ class TestPRReviewCollectionService:
 
         mock_github.find_closed_prs_basic_info.return_value = [basic_info]
         mock_github.get_full_pr_metadata.return_value = pr_metadata
-        mock_writer.file_exists_from_basic_info.return_value = False  # File doesn't exist
-        mock_writer.file_exists.return_value = False  # For _process_single_pr
+        mock_writer.exists_file_from_basic_info.return_value = False  # File doesn't exist
+        mock_writer.exists_file.return_value = False  # For _process_single_pr
         mock_formatter.format_comments.return_value = "comments"
         mock_formatter.format_diff_excerpt.return_value = "diff"
 

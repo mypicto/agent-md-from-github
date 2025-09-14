@@ -33,10 +33,10 @@ class FileSystemOutputWriter:
         diff_file = fileSet.get_diff_file_path()
         self._write_text_file(diff_file, diff_content)
     
-    def file_exists_from_basic_info(self, basic_info: PullRequestBasicInfo, output_directory: Path) -> bool:
+    def exists_file_from_basic_info(self, basic_info: PullRequestBasicInfo, output_directory: Path) -> bool:
         """Check if PR files already exist using basic info."""
         fileSet = PullRequestFileSet.create_with_basic_info(output_directory, basic_info)
-        return fileSet.file_exists()
+        return fileSet.exists_file()
 
     def _write_text_file(self, file_path: Path, content: str) -> None:
         """Write text content to file."""

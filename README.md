@@ -1,6 +1,6 @@
-# GitHub PR Review Comments Collector
+# GitHub PR Review Comments Collector and Utilities
 
-GitHubリポジトリの指定期間内にクローズされたプルリクエストから、**コードレビューコメント**（inline review comments）と**関連するDiff抜粋**を収集するPythonスクリプトです。
+GitHubリポジトリの指定期間内にクローズされたプルリクエストから、**コードレビューコメント**（inline review comments）と**関連するDiff抜粋**を収集するPythonスクリプトです。また、収集したデータの管理ユーティリティも提供します。
 
 ## 特徴
 
@@ -11,6 +11,7 @@ GitHubリポジトリの指定期間内にクローズされたプルリクエ�
 - ✅ **効率的なAPI利用**: 基本情報取得と詳細取得を分離し、不要なAPI呼び出しを削減
 - ✅ **適切な権限管理**: Fine-grained personal access tokenに対応
 - ✅ **構造化出力**: JSON + Patchファイル形式
+- ✅ **データ管理**: 収集したデータの欠如チェック機能
 
 ## 処理フロー
 
@@ -94,13 +95,29 @@ python scripts/src/auth.py --clear-token
 
 ## 使用方法
 
+### 利用可能なコマンド
+
+- `fetch.py`: PRレビューコメントの収集（メイン機能）
+- `list_missing_summaries.py`: 収集したデータからサマリーファイルが欠如しているPRをリストアップ
+- `auth.py`: GitHub認証トークンの管理
+
 ### 基本的な使用例
+
+#### PRレビューコメントの収集
 
 ```bash
 python scripts/src/fetch.py --repo "octo-org/example" --from-date "2025-09-01" --to-date "2025-09-10"
 ```
 
+#### サマリーファイルの欠如チェック
+
+```bash
+python list_missing_summaries.py --repo "octo-org/example" --output-dir "pullrequests"
+```
+
 ### 高度な使用例
+
+#### PRレビューコメントの収集（詳細指定）
 
 ```bash
 # 出力ディレクトリとタイムゾーンを指定
@@ -113,12 +130,16 @@ python scripts/src/fetch.py \
   --verbose
 ```
 
+#### サマリーファイルの欠如チェック（詳細指定）
+
+```bash
+# 出力ディレクトリを指定
+python list_missing_summaries.py \
+  --repo "owner/repository" \
+  --output-dir "my_output"
+```
+
 ### コマンドラインオプション
-
-#### 利用可能なコマンド
-
-- `fetch.py`: PRレビューコメントの収集（メイン機能）
-- `auth.py`: GitHub認証トークンの管理
 
 #### fetch.pyのオプション
 
@@ -139,6 +160,13 @@ python scripts/src/fetch.py \
 | `--store-token` | ✅ | GitHubトークンをキーリングに保存 |
 | `--clear-token` | ❌ | 保存されたトークンを削除 |
 
+#### list_missing_summaries.pyのオプション
+
+| オプション | 必須 | 説明 | デフォルト値 |
+|-----------|------|------|-------------|
+| `--repo` | ✅ | リポジトリ名（`owner/repo`形式） | - |
+| `--output-dir` | ❌ | 出力ディレクトリ | `pullrequests` |
+
 ## 出力仕様
 
 ### ディレクトリ構造
@@ -149,19 +177,23 @@ pullrequests/
 │   ├── repo1/
 │   │   ├── 2025-09-01/
 │   │   │   ├── PR-123-comments.json
-│   │   │   └── PR-123-diff.patch
+│   │   │   ├── PR-123-diff.patch
+│   │   │   └── PR-123-summary.md
 │   │   ├── 2025-09-02/
 │   │   │   ├── PR-456-comments.json
-│   │   │   └── PR-456-diff.patch
+│   │   │   ├── PR-456-diff.patch
+│   │   │   └── PR-456-summary.md
 │   ├── repo2/
 │   │   ├── 2025-09-03/
 │   │   │   ├── PR-789-comments.json
-│   │   │   └── PR-789-diff.patch
+│   │   │   ├── PR-789-diff.patch
+│   │   │   └── PR-789-summary.md
 ├── owner2/
 │   └── repo3/
 │       ├── 2025-09-04/
 │       │   ├── PR-101-comments.json
-│       │   └── PR-101-diff.patch
+│       │   ├── PR-101-diff.patch
+│       │   └── PR-101-summary.md
 ```
 
 ### JSON出力形式（`PR-{number}-comments.json`）

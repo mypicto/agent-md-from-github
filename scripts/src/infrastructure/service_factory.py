@@ -8,8 +8,10 @@ from typing import Optional
 from github import Github
 
 from ..application.services.pr_review_collection_service import PRReviewCollectionService
+from ..application.services.missing_summaries_service import MissingSummariesService
 from .file_system_output_writer import FileSystemOutputWriter
 from .repositories.github_repository import GitHubRepository
+from .repositories.pull_request_file_set_repository import PullRequestFileSetRepository
 from .json_output_formatter import JsonOutputFormatter
 from .services.timezone_converter import TimezoneConverter
 
@@ -82,3 +84,13 @@ class ServiceFactory:
         # Return the application-specific logger
         logger = logging.getLogger("prcollector")
         return logger
+    
+    @staticmethod
+    def create_missing_summaries_service() -> MissingSummariesService:
+        """Create a missing summaries service with all dependencies.
+        
+        Returns:
+            Configured missing summaries service
+        """
+        file_set_repository = PullRequestFileSetRepository()
+        return MissingSummariesService(file_set_repository)

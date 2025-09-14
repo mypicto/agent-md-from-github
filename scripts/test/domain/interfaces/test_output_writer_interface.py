@@ -12,4 +12,4 @@ class TestOutputWriterInterface:
         """Test that OutputWriterInterface is defined as a protocol."""
         # This is a protocol/interface, so we mainly test that it exists
         assert hasattr(OutputWriterInterface, 'write_pr_data')
-        assert hasattr(OutputWriterInterface, 'file_exists_from_basic_info')
+        assert hasattr(OutputWriterInterface, 'exists_file_from_basic_info')
