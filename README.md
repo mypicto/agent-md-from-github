@@ -80,6 +80,7 @@ python scripts/src/list_missing_summaries.py --repo "owner/repository"
 |----------|------|
 | `fetch.py` | PRレビューコメントの収集 |
 | `list_missing_summaries.py` | サマリーデータの欠如チェック |
+| `delete_summaries.py` | サマリーデータの削除 |
 | `auth.py` | GitHubトークンの管理 |
 
 ### fetch.py オプション
@@ -99,6 +100,13 @@ python scripts/src/list_missing_summaries.py --repo "owner/repository"
 | オプション | 必須 | 説明 | デフォルト |
 |-----------|------|------|-----------|
 | `--repo` | ✅ | リポジトリ名（`owner/repo`形式） | - |
+| `--output-dir` | ❌ | 出力ディレクトリ | `pullrequests` |
+
+### delete_summaries.py オプション
+
+| オプション | 必須 | 説明 | デフォルト |
+|-----------|------|------|-----------|
+| `--repo` | ❌ | リポジトリ名（`owner/repo`形式、全リポジトリ対象時は未指定） | - |
 | `--output-dir` | ❌ | 出力ディレクトリ | `pullrequests` |
 
 ### auth.py オプション

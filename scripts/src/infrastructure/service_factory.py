@@ -9,11 +9,13 @@ from github import Github
 
 from ..application.services.pr_review_collection_service import PRReviewCollectionService
 from ..application.services.missing_summaries_service import MissingSummariesService
+from ..application.services.delete_summaries_service import DeleteSummariesService
 from .file_system_output_writer import FileSystemOutputWriter
 from .repositories.github_repository import GitHubRepository
 from .repositories.pull_request_file_set_repository import PullRequestFileSetRepository
 from .json_output_formatter import JsonOutputFormatter
 from .services.timezone_converter import TimezoneConverter
+from .file_system_deleter import FileSystemDeleter
 
 
 class ServiceFactory:
@@ -82,7 +84,7 @@ class ServiceFactory:
         root_logger.addHandler(handler)
         
         # Return the application-specific logger
-        logger = logging.getLogger("prcollector")
+        logger = logging.getLogger()
         return logger
     
     @staticmethod
@@ -94,3 +96,13 @@ class ServiceFactory:
         """
         file_set_repository = PullRequestFileSetRepository()
         return MissingSummariesService(file_set_repository)
+    
+    @staticmethod
+    def create_delete_summaries_service() -> DeleteSummariesService:
+        """Create a delete summaries service with all dependencies.
+        
+        Returns:
+            Configured delete summaries service
+        """
+        file_deleter = FileSystemDeleter()
+        return DeleteSummariesService(file_deleter)
