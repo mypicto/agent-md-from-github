@@ -30,7 +30,7 @@ class GitHubRepository:
         """
         self._github = github_client
         self._timezone_converter = timezone_converter
-        self._logger = logging.getLogger("prcollector")
+        self._logger = logging.getLogger("fetch")
     
     def find_closed_prs_basic_info(
         self, 

@@ -33,7 +33,7 @@ class PRReviewCollectionService:
         self._github_repository = github_repository
         self._output_formatter = output_formatter
         self._output_writer = output_writer
-        self._logger = logging.getLogger("prcollector")
+        self._logger = logging.getLogger("fetch")
     
     def collect_review_comments(
         self,
