@@ -7,14 +7,14 @@ mode: agent
 # Execution Order
 
 1. 必要なパラメータが全て揃っていることを確認してください。不足している場合は、ユーザーに質問して要求してください。以下の必須パラメータが揃うまでは次のステップへは進めません。
-  -  対象リポジトリ（例: `octo-org/example`）
+  -  対象リポジトリ（例: `owner/repository`）
   -  開始日（例: `2025-09-01`）
   -  終了日（例: `2025-09-10`）
 
 2. Pull Requestを収集するためのコマンドを実行してください。以下の形式に従ってください。
 
   ```bash
-  python scripts/src/fetch.py --repo "octo-org/example" --from-date "2025-09-01" --to-date "2025-09-10"
+  python scripts/src/fetch.py --repo "owner/repository" --from-date "2025-09-01" --to-date "2025-09-10"
   ```
 
 3. コマンドの実行結果をユーザーに提供してください。エラーが発生した場合には、そのエラーメッセージと解決策を提案してください。
