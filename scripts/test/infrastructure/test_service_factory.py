@@ -12,44 +12,53 @@ class TestServiceFactory:
 
     def test_create_pr_collection_service_正常作成_サービスが作成される(self):
         """Test create_pr_collection_service creates service correctly."""
-        with patch('scripts.src.infrastructure.service_factory.Github') as mock_github_class:
-            with patch('scripts.src.infrastructure.service_factory.TimezoneConverter') as mock_timezone_class:
-                with patch('scripts.src.infrastructure.service_factory.GitHubRepository') as mock_repo_class:
-                    with patch('scripts.src.infrastructure.service_factory.JsonOutputFormatter') as mock_formatter_class:
-                        with patch('scripts.src.infrastructure.service_factory.FileSystemOutputWriter') as mock_writer_class:
-                            with patch('scripts.src.infrastructure.service_factory.PRReviewCollectionService') as mock_service_class:
+        with patch('scripts.src.infrastructure.service_factory.Github') as mock_github_class, \
+             patch('scripts.src.infrastructure.service_factory.TimezoneConverter') as mock_timezone_class, \
+             patch('scripts.src.infrastructure.service_factory.GitHubRepository') as mock_repo_class, \
+             patch('scripts.src.infrastructure.service_factory.JsonOutputFormatter') as mock_formatter_class, \
+             patch('scripts.src.infrastructure.service_factory.FileSystemOutputWriter') as mock_writer_class, \
+             patch('scripts.src.infrastructure.service_factory.AICommentFilter') as mock_filter_class, \
+             patch('scripts.src.infrastructure.service_factory.PRReviewCollectionService') as mock_service_class:
 
-                                mock_github_instance = MagicMock()
-                                mock_github_class.return_value = mock_github_instance
+            # Setup mock instances
+            mock_github_instance = MagicMock()
+            mock_github_class.return_value = mock_github_instance
 
-                                mock_timezone_instance = MagicMock()
-                                mock_timezone_class.return_value = mock_timezone_instance
+            mock_timezone_instance = MagicMock()
+            mock_timezone_class.return_value = mock_timezone_instance
 
-                                mock_repo_instance = MagicMock()
-                                mock_repo_class.return_value = mock_repo_instance
+            mock_repo_instance = MagicMock()
+            mock_repo_class.return_value = mock_repo_instance
 
-                                mock_formatter_instance = MagicMock()
-                                mock_formatter_class.return_value = mock_formatter_instance
+            mock_formatter_instance = MagicMock()
+            mock_formatter_class.return_value = mock_formatter_instance
 
-                                mock_writer_instance = MagicMock()
-                                mock_writer_class.return_value = mock_writer_instance
+            mock_writer_instance = MagicMock()
+            mock_writer_class.return_value = mock_writer_instance
 
-                                mock_service_instance = MagicMock()
-                                mock_service_class.return_value = mock_service_instance
+            mock_filter_instance = MagicMock()
+            mock_filter_class.return_value = mock_filter_instance
 
-                                service = ServiceFactory.create_pr_collection_service("token", "Asia/Tokyo")
+            mock_service_instance = MagicMock()
+            mock_service_class.return_value = mock_service_instance
 
-                                assert service == mock_service_instance
-                                mock_github_class.assert_called_once_with("token")
-                                mock_timezone_class.assert_called_once_with("Asia/Tokyo")
-                                mock_repo_class.assert_called_once_with(mock_github_instance, mock_timezone_instance)
-                                mock_formatter_class.assert_called_once()
-                                mock_writer_class.assert_called_once()
-                                mock_service_class.assert_called_once_with(
-                                    github_repository=mock_repo_instance,
-                                    output_formatter=mock_formatter_instance,
-                                    output_writer=mock_writer_instance
-                                )
+            # Call the method
+            service = ServiceFactory.create_pr_collection_service("token", "Asia/Tokyo")
+
+            # Assertions
+            assert service == mock_service_instance
+            mock_github_class.assert_called_once_with("token")
+            mock_timezone_class.assert_called_once_with("Asia/Tokyo")
+            mock_repo_class.assert_called_once_with(mock_github_instance, mock_timezone_instance)
+            mock_formatter_class.assert_called_once()
+            mock_writer_class.assert_called_once()
+            mock_filter_class.assert_called_once()
+            mock_service_class.assert_called_once_with(
+                github_repository=mock_repo_instance,
+                output_formatter=mock_formatter_instance,
+                output_writer=mock_writer_instance,
+                comment_filter=mock_filter_instance
+            )
 
     def test_setup_logging_verboseモード_デバッグレベルが設定される(self):
         """Test setup_logging sets debug level when verbose is True."""

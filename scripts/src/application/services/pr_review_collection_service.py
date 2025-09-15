@@ -11,6 +11,7 @@ from ...domain.repository_identifier import RepositoryIdentifier
 from ...domain.interfaces.github_repository_interface import GitHubRepositoryInterface
 from ...domain.interfaces.output_formatter_interface import OutputFormatterInterface
 from ...domain.interfaces.output_writer_interface import OutputWriterInterface
+from ...domain.interfaces.comment_filter_interface import CommentFilterInterface
 from ..exceptions.pr_review_collection_error import PRReviewCollectionError
 
 
@@ -21,7 +22,8 @@ class PRReviewCollectionService:
         self,
         github_repository: GitHubRepositoryInterface,
         output_formatter: OutputFormatterInterface,
-        output_writer: OutputWriterInterface
+        output_writer: OutputWriterInterface,
+        comment_filter: CommentFilterInterface
     ):
         """Initialize PR review collection service.
         
@@ -29,10 +31,12 @@ class PRReviewCollectionService:
             github_repository: GitHub repository interface
             output_formatter: Output formatting strategy
             output_writer: Output writing strategy
+            comment_filter: Comment filtering strategy
         """
         self._github_repository = github_repository
         self._output_formatter = output_formatter
         self._output_writer = output_writer
+        self._comment_filter = comment_filter
         self._logger = logging.getLogger("fetch")
     
     def collect_review_comments(
@@ -95,20 +99,31 @@ class PRReviewCollectionService:
             True if PR was processed, False
         """
         try:
+            # Filter comments before formatting
+            filtered_comments = self._comment_filter.filter_comments(pr_metadata.review_comments)
+            filtered_pr_metadata = PullRequestMetadata(
+                number=pr_metadata.number,
+                title=pr_metadata.title,
+                closed_at=pr_metadata.closed_at,
+                is_merged=pr_metadata.is_merged,
+                review_comments=filtered_comments,
+                repository_id=pr_metadata.repository_id
+            )
+            
             # Format output content
-            comments_content = self._output_formatter.format_comments(pr_metadata)
-            diff_content = self._output_formatter.format_diff_excerpt(pr_metadata)
+            comments_content = self._output_formatter.format_comments(filtered_pr_metadata)
+            diff_content = self._output_formatter.format_diff_excerpt(filtered_pr_metadata)
             
             # Write output
             self._output_writer.write_pr_data(
-                pr_metadata,
+                filtered_pr_metadata,
                 comments_content,
                 diff_content,
                 output_directory
             )
             
             self._logger.info(
-                f"Saved PR #{pr_metadata.number}: {pr_metadata.title} data ({len(pr_metadata.review_comments)} comments)"
+                f"Saved PR #{filtered_pr_metadata.number}: {filtered_pr_metadata.title} data ({len(filtered_pr_metadata.review_comments)} comments)"
             )
             return True
             

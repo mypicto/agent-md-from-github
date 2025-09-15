@@ -22,27 +22,32 @@ class TestPRReviewCollectionService:
         mock_github = MagicMock()
         mock_formatter = MagicMock()
         mock_writer = MagicMock()
+        mock_filter = MagicMock()
 
         service = PRReviewCollectionService(
             github_repository=mock_github,
             output_formatter=mock_formatter,
-            output_writer=mock_writer
+            output_writer=mock_writer,
+            comment_filter=mock_filter
         )
 
         assert service._github_repository == mock_github
         assert service._output_formatter == mock_formatter
         assert service._output_writer == mock_writer
+        assert service._comment_filter == mock_filter
 
     def test_collect_review_comments_正常実行_レビューコメントが収集される(self):
         """Test collect_review_comments executes successfully."""
         mock_github = MagicMock()
         mock_formatter = MagicMock()
         mock_writer = MagicMock()
+        mock_filter = MagicMock()
 
         service = PRReviewCollectionService(
             github_repository=mock_github,
             output_formatter=mock_formatter,
-            output_writer=mock_writer
+            output_writer=mock_writer,
+            comment_filter=mock_filter
         )
 
         repo_id = RepositoryIdentifier(owner="test", name="repo")
@@ -99,11 +104,13 @@ class TestPRReviewCollectionService:
         mock_github = MagicMock()
         mock_formatter = MagicMock()
         mock_writer = MagicMock()
+        mock_filter = MagicMock()
 
         service = PRReviewCollectionService(
             github_repository=mock_github,
             output_formatter=mock_formatter,
-            output_writer=mock_writer
+            output_writer=mock_writer,
+            comment_filter=mock_filter
         )
 
         repo_id = RepositoryIdentifier(owner="test", name="repo")
@@ -124,11 +131,13 @@ class TestPRReviewCollectionService:
         mock_github = MagicMock()
         mock_formatter = MagicMock()
         mock_writer = MagicMock()
+        mock_filter = MagicMock()
 
         service = PRReviewCollectionService(
             github_repository=mock_github,
             output_formatter=mock_formatter,
-            output_writer=mock_writer
+            output_writer=mock_writer,
+            comment_filter=mock_filter
         )
 
         comment = ReviewComment(

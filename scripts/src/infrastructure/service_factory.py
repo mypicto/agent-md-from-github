@@ -16,6 +16,7 @@ from .repositories.pull_request_file_set_repository import PullRequestFileSetRep
 from .json_output_formatter import JsonOutputFormatter
 from .services.timezone_converter import TimezoneConverter
 from .file_system_deleter import FileSystemDeleter
+from .filters.ai_comment_filter import AICommentFilter
 
 
 class ServiceFactory:
@@ -50,11 +51,15 @@ class ServiceFactory:
         output_formatter = JsonOutputFormatter()
         output_writer = FileSystemOutputWriter()
         
+        # Create comment filter
+        comment_filter = AICommentFilter()
+        
         # Create and return application service
         return PRReviewCollectionService(
             github_repository=github_repository,
             output_formatter=output_formatter,
-            output_writer=output_writer
+            output_writer=output_writer,
+            comment_filter=comment_filter
         )
     
     @staticmethod
