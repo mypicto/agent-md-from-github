@@ -30,7 +30,7 @@ mode: agent
       touch <PATH_TO_PR_SUMMARY_MD>/PR-<No>-summary.md
       ```
 
-   2. `PR-<No>-comments.json` を読み込み、`context_patch_excerpt` と `body` を分析。  
+   2. `PR-<No>-metadata.json` を読み込み、`context_patch_excerpt` と `body` を分析。  
    3. レビューを精査し、コード品質向上のための重要な観点を抽出する。  
       - 意味単位で分割し、重複は統合。  
       - 各観点にカテゴリ（例: 設計 / 可読性 / テスト / パフォーマンス / セキュリティ / エラーハンドリング / 並行性 / API設計 / ドキュメント / 国際化）を付与。  
@@ -57,7 +57,7 @@ mode: agent
 # Laws
 
 - 作業中のスクリプト生成を禁止。
-- `PR-*-comments.json` にレビューコメントが存在しない場合は、空の `PR-*-summary.md` を生成。
+- `PR-*-metadata.json` にレビューコメントが存在しない場合は、空の `PR-*-summary.md` を生成。
 - 全てのコメントを精査し、コード品質に関する重要な観点を漏れなく抽出。
 - 重複は統合し、簡潔かつ明確に記述。
 

@@ -17,8 +17,7 @@ from .application.services import (
 # Domain layer - interfaces
 from .domain.interfaces import (
     GitHubRepositoryInterface,
-    OutputFormatterInterface,
-    OutputWriterInterface,
+    PullRequestMetadataRepositoryInterface,
     TimezoneConverterInterface
 )
 
@@ -29,10 +28,8 @@ from .domain.repository_identifier import RepositoryIdentifier
 from .domain.review_comment import ReviewComment
 
 # Infrastructure layer
-from .infrastructure.file_system_output_writer import FileSystemOutputWriter
-from .infrastructure.json_output_formatter import JsonOutputFormatter
 from .infrastructure.service_factory import ServiceFactory
-from .infrastructure.repositories import GitHubRepository
+from .infrastructure.repositories import GitHubRepository, PullRequestMetadataRepository
 from .infrastructure.services import TimezoneConverter
 
 
@@ -49,8 +46,7 @@ __all__ = [
     
     # Domain layer - interfaces
     "GitHubRepositoryInterface",
-    "OutputFormatterInterface",
-    "OutputWriterInterface", 
+    "PullRequestMetadataRepositoryInterface",
     "TimezoneConverterInterface",
     
     # Domain layer - value objects
@@ -60,8 +56,9 @@ __all__ = [
     "ReviewComment",
     
     # Infrastructure layer
-    "FileSystemOutputWriter",
+        # Infrastructure layer
     "GitHubRepository",
-    "JsonOutputFormatter",
+    "PullRequestMetadataRepository",
+    "ServiceFactory",
     "TimezoneConverter"
 ]

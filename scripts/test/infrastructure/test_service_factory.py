@@ -14,9 +14,8 @@ class TestServiceFactory:
         """Test create_pr_collection_service creates service correctly."""
         with patch('scripts.src.infrastructure.service_factory.Github') as mock_github_class, \
              patch('scripts.src.infrastructure.service_factory.TimezoneConverter') as mock_timezone_class, \
-             patch('scripts.src.infrastructure.service_factory.GitHubRepository') as mock_repo_class, \
-             patch('scripts.src.infrastructure.service_factory.JsonOutputFormatter') as mock_formatter_class, \
-             patch('scripts.src.infrastructure.service_factory.FileSystemOutputWriter') as mock_writer_class, \
+             patch('scripts.src.infrastructure.service_factory.GitHubRepository') as mock_github_repo_class, \
+             patch('scripts.src.infrastructure.service_factory.PullRequestMetadataRepository') as mock_pr_repo_class, \
              patch('scripts.src.infrastructure.service_factory.AICommentFilter') as mock_filter_class, \
              patch('scripts.src.infrastructure.service_factory.PRReviewCollectionService') as mock_service_class:
 
@@ -27,14 +26,11 @@ class TestServiceFactory:
             mock_timezone_instance = MagicMock()
             mock_timezone_class.return_value = mock_timezone_instance
 
-            mock_repo_instance = MagicMock()
-            mock_repo_class.return_value = mock_repo_instance
+            mock_github_repo_instance = MagicMock()
+            mock_github_repo_class.return_value = mock_github_repo_instance
 
-            mock_formatter_instance = MagicMock()
-            mock_formatter_class.return_value = mock_formatter_instance
-
-            mock_writer_instance = MagicMock()
-            mock_writer_class.return_value = mock_writer_instance
+            mock_pr_repo_instance = MagicMock()
+            mock_pr_repo_class.return_value = mock_pr_repo_instance
 
             mock_filter_instance = MagicMock()
             mock_filter_class.return_value = mock_filter_instance
@@ -49,14 +45,12 @@ class TestServiceFactory:
             assert service == mock_service_instance
             mock_github_class.assert_called_once_with("token")
             mock_timezone_class.assert_called_once_with("Asia/Tokyo")
-            mock_repo_class.assert_called_once_with(mock_github_instance, mock_timezone_instance)
-            mock_formatter_class.assert_called_once()
-            mock_writer_class.assert_called_once()
+            mock_github_repo_class.assert_called_once_with(mock_github_instance, mock_timezone_instance)
+            mock_pr_repo_class.assert_called_once_with()  # PullRequestMetadataRepository()
             mock_filter_class.assert_called_once()
             mock_service_class.assert_called_once_with(
-                github_repository=mock_repo_instance,
-                output_formatter=mock_formatter_instance,
-                output_writer=mock_writer_instance,
+                github_repository=mock_github_repo_instance,
+                pr_metadata_repository=mock_pr_repo_instance,
                 comment_filter=mock_filter_instance
             )
 

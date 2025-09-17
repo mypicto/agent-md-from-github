@@ -20,33 +20,28 @@ class TestPRReviewCollectionService:
     def test___init___初期化_サービスが正しく初期化される(self):
         """Test __init__ initializes the service correctly."""
         mock_github = MagicMock()
-        mock_formatter = MagicMock()
-        mock_writer = MagicMock()
+        mock_repository = MagicMock()
         mock_filter = MagicMock()
 
         service = PRReviewCollectionService(
             github_repository=mock_github,
-            output_formatter=mock_formatter,
-            output_writer=mock_writer,
+            pr_metadata_repository=mock_repository,
             comment_filter=mock_filter
         )
 
         assert service._github_repository == mock_github
-        assert service._output_formatter == mock_formatter
-        assert service._output_writer == mock_writer
+        assert service._pr_metadata_repository == mock_repository
         assert service._comment_filter == mock_filter
 
     def test_collect_review_comments_正常実行_レビューコメントが収集される(self):
         """Test collect_review_comments executes successfully."""
         mock_github = MagicMock()
-        mock_formatter = MagicMock()
-        mock_writer = MagicMock()
+        mock_repository = MagicMock()
         mock_filter = MagicMock()
 
         service = PRReviewCollectionService(
             github_repository=mock_github,
-            output_formatter=mock_formatter,
-            output_writer=mock_writer,
+            pr_metadata_repository=mock_repository,
             comment_filter=mock_filter
         )
 
@@ -88,28 +83,23 @@ class TestPRReviewCollectionService:
 
         mock_github.find_closed_prs_basic_info.return_value = [basic_info]
         mock_github.get_full_pr_metadata.return_value = pr_metadata
-        mock_writer.exists_file_from_basic_info.return_value = False  # File doesn't exist
-        mock_writer.exists_file.return_value = False  # For _process_single_pr
-        mock_formatter.format_comments.return_value = "comments"
-        mock_formatter.format_diff_excerpt.return_value = "diff"
+        mock_repository.exists.return_value = False  # File doesn't exist
 
         service.collect_review_comments(repo_id, date_range, output_dir)
 
         mock_github.find_closed_prs_basic_info.assert_called_once_with(repo_id, date_range)
         mock_github.get_full_pr_metadata.assert_called_once_with(1, repo_id)
-        mock_writer.write_pr_data.assert_called_once()
+        mock_repository.save.assert_called_once()
 
     def test_collect_review_comments_例外発生_PRReviewCollectionErrorが発生する(self):
         """Test collect_review_comments raises PRReviewCollectionError on exception."""
         mock_github = MagicMock()
-        mock_formatter = MagicMock()
-        mock_writer = MagicMock()
+        mock_repository = MagicMock()
         mock_filter = MagicMock()
 
         service = PRReviewCollectionService(
             github_repository=mock_github,
-            output_formatter=mock_formatter,
-            output_writer=mock_writer,
+            pr_metadata_repository=mock_repository,
             comment_filter=mock_filter
         )
 
@@ -129,14 +119,12 @@ class TestPRReviewCollectionService:
     def test__process_single_pr_正常処理_Trueが返される(self):
         """Test _process_single_pr returns True on successful processing."""
         mock_github = MagicMock()
-        mock_formatter = MagicMock()
-        mock_writer = MagicMock()
+        mock_repository = MagicMock()
         mock_filter = MagicMock()
 
         service = PRReviewCollectionService(
             github_repository=mock_github,
-            output_formatter=mock_formatter,
-            output_writer=mock_writer,
+            pr_metadata_repository=mock_repository,
             comment_filter=mock_filter
         )
 
@@ -161,8 +149,6 @@ class TestPRReviewCollectionService:
         )
         output_dir = Path("test_dir")
 
-        mock_formatter.format_comments.return_value = "comments"
-        mock_formatter.format_diff_excerpt.return_value = "diff"
-
         result = service._process_single_pr(pr_metadata, output_dir)
         assert result is True
+        mock_repository.save.assert_called_once()

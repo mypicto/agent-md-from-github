@@ -9,8 +9,7 @@ from ...domain.date_range import DateRange
 from ...domain.pull_request_metadata import PullRequestMetadata
 from ...domain.repository_identifier import RepositoryIdentifier
 from ...domain.interfaces.github_repository_interface import GitHubRepositoryInterface
-from ...domain.interfaces.output_formatter_interface import OutputFormatterInterface
-from ...domain.interfaces.output_writer_interface import OutputWriterInterface
+from ...domain.interfaces.pull_request_metadata_repository_interface import PullRequestMetadataRepositoryInterface
 from ...domain.interfaces.comment_filter_interface import CommentFilterInterface
 from ..exceptions.pr_review_collection_error import PRReviewCollectionError
 
@@ -21,21 +20,18 @@ class PRReviewCollectionService:
     def __init__(
         self,
         github_repository: GitHubRepositoryInterface,
-        output_formatter: OutputFormatterInterface,
-        output_writer: OutputWriterInterface,
+        pr_metadata_repository: PullRequestMetadataRepositoryInterface,
         comment_filter: CommentFilterInterface
     ):
         """Initialize PR review collection service.
         
         Args:
             github_repository: GitHub repository interface
-            output_formatter: Output formatting strategy
-            output_writer: Output writing strategy
+            pr_metadata_repository: PR metadata repository
             comment_filter: Comment filtering strategy
         """
         self._github_repository = github_repository
-        self._output_formatter = output_formatter
-        self._output_writer = output_writer
+        self._pr_metadata_repository = pr_metadata_repository
         self._comment_filter = comment_filter
         self._logger = logging.getLogger("fetch")
     
@@ -72,7 +68,7 @@ class PRReviewCollectionService:
                 total_found += 1
                 
                 # Check if files already exist
-                if self._output_writer.exists_file_from_basic_info(basic_info, output_directory):
+                if self._pr_metadata_repository.exists(basic_info, output_directory):
                     skipped_count += 1
                     self._logger.info(f"Skipping PR #{basic_info.number} - files already exist")
                     continue
@@ -99,7 +95,7 @@ class PRReviewCollectionService:
             True if PR was processed, False
         """
         try:
-            # Filter comments before formatting
+            # Filter comments before saving
             filtered_comments = self._comment_filter.filter_comments(pr_metadata.review_comments)
             filtered_pr_metadata = PullRequestMetadata(
                 number=pr_metadata.number,
@@ -110,15 +106,8 @@ class PRReviewCollectionService:
                 repository_id=pr_metadata.repository_id
             )
             
-            # Format output content
-            comments_content = self._output_formatter.format_comments(filtered_pr_metadata)
-            
-            # Write output
-            self._output_writer.write_pr_data(
-                filtered_pr_metadata,
-                comments_content,
-                output_directory
-            )
+            # Save PR metadata
+            self._pr_metadata_repository.save(filtered_pr_metadata, output_directory)
             
             self._logger.info(
                 f"Saved PR #{filtered_pr_metadata.number}: {filtered_pr_metadata.title} data ({len(filtered_pr_metadata.review_comments)} comments)"

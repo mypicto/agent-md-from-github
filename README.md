@@ -125,10 +125,10 @@ pullrequests/
 ├── owner/
 │   └── repository/
 │       ├── 2025-09-01/
-│       │   ├── PR-123-comments.json
+│       │   ├── PR-123-metadata.json
 │       │   └── PR-123-summary.md
 │       └── 2025-09-02/
-│           ├── PR-456-comments.json
+│           ├── PR-456-metadata.json
 │           └── PR-456-summary.md
 ```
 

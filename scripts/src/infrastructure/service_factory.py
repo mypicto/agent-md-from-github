@@ -10,10 +10,9 @@ from github import Github
 from ..application.services.pr_review_collection_service import PRReviewCollectionService
 from ..application.services.missing_summaries_service import MissingSummariesService
 from ..application.services.delete_summaries_service import DeleteSummariesService
-from .file_system_output_writer import FileSystemOutputWriter
 from .repositories.github_repository import GitHubRepository
 from .repositories.pull_request_file_set_repository import PullRequestFileSetRepository
-from .json_output_formatter import JsonOutputFormatter
+from .repositories.pull_request_metadata_repository import PullRequestMetadataRepository
 from .services.timezone_converter import TimezoneConverter
 from .file_system_deleter import FileSystemDeleter
 from .filters.ai_comment_filter import AICommentFilter
@@ -47,9 +46,8 @@ class ServiceFactory:
         # Create GitHub repository
         github_repository = GitHubRepository(github_client, timezone_converter)
         
-        # Create output formatter and writer
-        output_formatter = JsonOutputFormatter()
-        output_writer = FileSystemOutputWriter()
+        # Create PR metadata repository
+        pr_metadata_repository = PullRequestMetadataRepository()
         
         # Create comment filter
         comment_filter = AICommentFilter()
@@ -57,8 +55,7 @@ class ServiceFactory:
         # Create and return application service
         return PRReviewCollectionService(
             github_repository=github_repository,
-            output_formatter=output_formatter,
-            output_writer=output_writer,
+            pr_metadata_repository=pr_metadata_repository,
             comment_filter=comment_filter
         )
     
