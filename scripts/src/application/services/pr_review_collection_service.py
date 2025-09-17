@@ -112,13 +112,11 @@ class PRReviewCollectionService:
             
             # Format output content
             comments_content = self._output_formatter.format_comments(filtered_pr_metadata)
-            diff_content = self._output_formatter.format_diff_excerpt(filtered_pr_metadata)
             
             # Write output
             self._output_writer.write_pr_data(
                 filtered_pr_metadata,
                 comments_content,
-                diff_content,
                 output_directory
             )
             

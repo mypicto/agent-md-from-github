@@ -51,10 +51,6 @@ class PullRequestFileSet:
         """Get the file path for comments."""
         return self._directory_path / f"PR-{self._pr_number}-comments.json"
 
-    def get_diff_file_path(self) -> Path:
-        """Get the file path for diff."""
-        return self._directory_path / f"PR-{self._pr_number}-diff.patch"
-
     def exists_file(self) -> bool:
         """Check if a file exists."""
         file_path = self.get_comments_file_path()

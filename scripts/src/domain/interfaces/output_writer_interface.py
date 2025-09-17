@@ -16,7 +16,6 @@ class OutputWriterInterface(Protocol):
         self, 
         pr_metadata: PullRequestMetadata, 
         comments_content: str, 
-        diff_content: str, 
         output_directory: Path
     ) -> None:
         """Write PR data to storage."""

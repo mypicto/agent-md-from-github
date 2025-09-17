@@ -39,18 +39,6 @@ class TestPullRequestFileSet:
             expected_path = output_directory / "test_owner" / "test_repo" / "2023-01-01" / "PR-123-comments.json"
             assert resolver.get_comments_file_path() == expected_path
 
-    def test_get_diff_file_path_正常取得_正しいdiffファイルパスが返される(self):
-        """Test get_diff_file_path returns correct file path."""
-        with tempfile.TemporaryDirectory() as temp_dir:
-            output_directory = Path(temp_dir)
-            repo_id = RepositoryIdentifier(owner="test_owner", name="test_repo")
-            closed_at = datetime(2023, 1, 1)
-            pr_number = 123
-            directory_path = output_directory / repo_id.owner / repo_id.name / closed_at.strftime("%Y-%m-%d")
-            resolver = PullRequestFileSet(directory_path, pr_number)
-            expected_path = output_directory / "test_owner" / "test_repo" / "2023-01-01" / "PR-123-diff.patch"
-            assert resolver.get_diff_file_path() == expected_path
-
     def test_exists_file_ファイルが存在する場合_Trueが返される(self):
         """Test exists_file returns True when file exists."""
         with tempfile.TemporaryDirectory() as temp_dir:
@@ -96,7 +84,6 @@ class TestPullRequestFileSet:
             expected_directory = output_directory / "test_owner" / "test_repo" / "2023-01-01"
             assert resolver.get_pr_directory() == expected_directory
             assert resolver.get_comments_file_path() == expected_directory / "PR-123-comments.json"
-            assert resolver.get_diff_file_path() == expected_directory / "PR-123-diff.patch"
 
     def test_create_with_basic_info_正常作成_インスタンスが生成される(self):
         """Test create_with_basic_info creates instance correctly."""
@@ -115,7 +102,6 @@ class TestPullRequestFileSet:
             expected_directory = output_directory / "test_owner" / "test_repo" / "2023-01-01"
             assert resolver.get_pr_directory() == expected_directory
             assert resolver.get_comments_file_path() == expected_directory / "PR-123-comments.json"
-            assert resolver.get_diff_file_path() == expected_directory / "PR-123-diff.patch"
 
     def test_get_summary_file_path_正常取得_正しいサマリーファイルパスが返される(self):
         """Test get_summary_file_path returns correct file path."""

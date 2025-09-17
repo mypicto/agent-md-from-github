@@ -11,4 +11,3 @@ class TestOutputFormatterInterface:
     def test_interface_定義_プロトコルとして定義されている(self):
         """Test that OutputFormatterInterface is defined as a protocol."""
         assert hasattr(OutputFormatterInterface, 'format_comments')
-        assert hasattr(OutputFormatterInterface, 'format_diff_excerpt')

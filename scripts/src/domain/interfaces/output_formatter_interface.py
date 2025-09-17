@@ -13,7 +13,3 @@ class OutputFormatterInterface(Protocol):
     def format_comments(self, pr_metadata: PullRequestMetadata) -> str:
         """Format review comments for output."""
         ...
-    
-    def format_diff_excerpt(self, pr_metadata: PullRequestMetadata) -> str:
-        """Format diff excerpt for output."""
-        ...

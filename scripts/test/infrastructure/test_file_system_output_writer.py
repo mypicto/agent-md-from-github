@@ -26,18 +26,17 @@ class TestFileSystemOutputWriter:
             repository_id=repo_id
         )
         comments_content = '{"test": "data"}'
-        diff_content = "diff content"
         output_directory = Path("test_output")
 
         with patch('builtins.open', mock_open()) as mock_file:
             with patch('pathlib.Path.mkdir') as mock_mkdir:
-                writer.write_pr_data(pr_metadata, comments_content, diff_content, output_directory)
+                writer.write_pr_data(pr_metadata, comments_content, output_directory)
 
                 # Check that mkdir was called
                 mock_mkdir.assert_called_once_with(parents=True, exist_ok=True)
 
-                # Check that open was called twice (for comments and diff files)
-                assert mock_file.call_count == 2
+                # Check that open was called twice (for comments file)
+                assert mock_file.call_count == 1
 
     def test__write_text_file_正常書き込み_ファイルが書き込まれる(self):
         """Test _write_text_file writes content correctly."""

@@ -13,10 +13,9 @@ class FileSystemOutputWriter:
     """File system output writer."""
     
     def write_pr_data(
-        self, 
-        pr_metadata: PullRequestMetadata, 
-        comments_content: str, 
-        diff_content: str, 
+        self,
+        pr_metadata: PullRequestMetadata,
+        comments_content: str,
         output_directory: Path
     ) -> None:
         """Write PR data to file system."""
@@ -30,8 +29,6 @@ class FileSystemOutputWriter:
         # Write files
         comments_file = fileSet.get_comments_file_path()
         self._write_text_file(comments_file, comments_content)
-        diff_file = fileSet.get_diff_file_path()
-        self._write_text_file(diff_file, diff_content)
     
     def exists_file_from_basic_info(self, basic_info: PullRequestBasicInfo, output_directory: Path) -> bool:
         """Check if PR files already exist using basic info."""
