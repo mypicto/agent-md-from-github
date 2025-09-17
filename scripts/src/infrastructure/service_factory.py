@@ -11,7 +11,6 @@ from ..application.services.pr_review_collection_service import PRReviewCollecti
 from ..application.services.missing_summaries_service import MissingSummariesService
 from ..application.services.delete_summaries_service import DeleteSummariesService
 from .repositories.github_repository import GitHubRepository
-from .repositories.pull_request_file_set_repository import PullRequestFileSetRepository
 from .repositories.pull_request_metadata_repository import PullRequestMetadataRepository
 from .repositories.pull_request_summary_repository import PullRequestSummaryRepository
 from .services.timezone_converter import TimezoneConverter
