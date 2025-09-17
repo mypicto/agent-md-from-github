@@ -11,9 +11,11 @@ from ..application.services.pr_review_collection_service import PRReviewCollecti
 from ..application.services.missing_summaries_service import MissingSummariesService
 from ..application.services.delete_summaries_service import DeleteSummariesService
 from ..application.services.comments_service import CommentsService
+from ..application.services.review_summary_service import ReviewSummaryService
 from .repositories.github_repository import GitHubRepository
 from .repositories.pull_request_metadata_repository import PullRequestMetadataRepository
 from .repositories.pull_request_summary_repository import PullRequestSummaryRepository
+from .repositories.review_summary_repository import ReviewSummaryRepository
 from .services.timezone_converter import TimezoneConverter
 from .file_system_deleter import FileSystemDeleter
 from .filters.ai_comment_filter import AICommentFilter
@@ -122,3 +124,36 @@ class ServiceFactory:
         pr_metadata_repository = PullRequestMetadataRepository()
         markdown_formatter = MarkdownFormatter()
         return CommentsService(pr_metadata_repository, markdown_formatter)
+    
+    @staticmethod
+    def create_review_summary_service(
+        github_token: str,
+        timezone: str = "Asia/Tokyo",
+        logger: Optional[logging.Logger] = None
+    ) -> ReviewSummaryService:
+        """Create a review summary service with all dependencies.
+        
+        Args:
+            github_token: GitHub personal access token
+            timezone: Target timezone for date conversion
+            logger: Optional logger instance
+            
+        Returns:
+            Configured review summary service
+        """
+        # Create GitHub client
+        github_client = Github(github_token)
+        
+        # Create timezone converter
+        timezone_converter = TimezoneConverter(timezone)
+        
+        # Create GitHub repository
+        github_repository = GitHubRepository(github_client, timezone_converter)
+        
+        # Create review summary repository
+        review_summary_repository = ReviewSummaryRepository()
+        
+        # Create PR metadata repository for validation
+        pr_metadata_repository = PullRequestMetadataRepository()
+        
+        return ReviewSummaryService(review_summary_repository, pr_metadata_repository)
