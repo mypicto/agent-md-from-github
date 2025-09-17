@@ -3,6 +3,7 @@ Application service for review summary management.
 """
 
 import logging
+from pathlib import Path
 
 from ...domain.review_summary import ReviewSummary
 from ...domain.repository_identifier import RepositoryIdentifier
@@ -48,16 +49,7 @@ class ReviewSummaryService:
             PRReviewCollectionError: If PR does not exist or other errors occur
         """
         # Validate PR exists by checking local metadata
-        try:
-            from pathlib import Path
-            pr_metadata_list = self._pr_metadata_repository.find_all_by_repository(
-                Path("pullrequests"), repository_id
-            )
-        except Exception as e:
-            raise PRReviewCollectionError(f"Failed to validate PR: {str(e)}")
-        
-        pr_exists = any(pr.number == pr_number for pr in pr_metadata_list)
-        
+        pr_exists = self._pr_metadata_repository.find_by_pr_number(Path("pullrequests"), repository_id, pr_number)
         if not pr_exists:
             raise PRReviewCollectionError(f"PR #{pr_number} not found in local metadata for {repository_id.to_string()}")
         

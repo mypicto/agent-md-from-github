@@ -245,3 +245,89 @@ class TestPullRequestMetadataRepository:
             assert len(result) == 1
             assert result[0].number == 123
             assert result[0].title == "Valid PR"
+
+    def test_find_by_pr_number_PRが見つかる場合正しく返す(self):
+        """Test that find_by_pr_number returns the correct PR when found."""
+        # Arrange
+        repo = PullRequestMetadataRepository()
+        repo_id = RepositoryIdentifier(owner="test-owner", name="test-repo")
+
+        pr_metadata = PullRequestMetadata(
+            number=123,
+            title="Test PR",
+            closed_at=datetime(2023, 10, 1, 12, 0, 0),
+            is_merged=True,
+            review_comments=[
+                ReviewComment(
+                    comment_id=1,
+                    file_path="file.py",
+                    position=None,
+                    commit_id="commit1",
+                    author="user1",
+                    created_at=datetime(2023, 9, 30, 10, 0, 0),
+                    body="Comment",
+                    diff_context="@@ -1 +1 @@\n-old\n+new"
+                )
+            ],
+            repository_id=repo_id
+        )
+
+        with tempfile.TemporaryDirectory() as temp_dir:
+            output_dir = Path(temp_dir)
+
+            # Save test data
+            repo.save(pr_metadata, output_dir)
+
+            # Act
+            result = repo.find_by_pr_number(output_dir, repo_id, 123)
+
+            # Assert
+            assert result is not None
+            assert result.number == 123
+            assert result.title == "Test PR"
+            assert result.closed_at == datetime(2023, 10, 1, 12, 0, 0)
+            assert result.is_merged is True
+            assert len(result.review_comments) == 1
+            assert result.review_comments[0].body == "Comment"
+
+    def test_find_by_pr_number_PRが見つからない場合Noneを返す(self):
+        """Test that find_by_pr_number returns None when PR is not found."""
+        # Arrange
+        repo = PullRequestMetadataRepository()
+        repo_id = RepositoryIdentifier(owner="test-owner", name="test-repo")
+
+        pr_metadata = PullRequestMetadata(
+            number=123,
+            title="Test PR",
+            closed_at=datetime(2023, 10, 1, 12, 0, 0),
+            is_merged=True,
+            review_comments=[],
+            repository_id=repo_id
+        )
+
+        with tempfile.TemporaryDirectory() as temp_dir:
+            output_dir = Path(temp_dir)
+
+            # Save test data
+            repo.save(pr_metadata, output_dir)
+
+            # Act
+            result = repo.find_by_pr_number(output_dir, repo_id, 999)  # Non-existent PR number
+
+            # Assert
+            assert result is None
+
+    def test_find_by_pr_number_リポジトリにPRが存在しない場合Noneを返す(self):
+        """Test that find_by_pr_number returns None when no PRs exist in repository."""
+        # Arrange
+        repo = PullRequestMetadataRepository()
+        repo_id = RepositoryIdentifier(owner="test-owner", name="test-repo")
+
+        with tempfile.TemporaryDirectory() as temp_dir:
+            output_dir = Path(temp_dir)
+
+            # Act
+            result = repo.find_by_pr_number(output_dir, repo_id, 123)
+
+            # Assert
+            assert result is None

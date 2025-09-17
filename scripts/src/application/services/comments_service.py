@@ -51,17 +51,7 @@ class CommentsService:
             CommentsServiceError: If PR not found or other errors
         """
         # Find all metadata for the repository
-        pr_metadatas = self._pr_metadata_repository.find_all_by_repository(
-            output_directory, repo_id
-        )
-        
-        # Filter by PR number
-        target_pr = None
-        for pr_metadata in pr_metadatas:
-            if str(pr_metadata.number) == pr_number:
-                target_pr = pr_metadata
-                break
-        
+        target_pr = self._pr_metadata_repository.find_by_pr_number(output_directory, repo_id, pr_number)
         if target_pr is None:
             raise CommentsServiceError(f"PR not found: {pr_number}")
         

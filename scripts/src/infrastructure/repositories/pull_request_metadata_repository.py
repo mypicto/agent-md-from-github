@@ -5,7 +5,7 @@ PullRequestMetadata repository implementation for JSON persistence.
 import json
 from dataclasses import asdict
 from pathlib import Path
-from typing import List
+from typing import List, Optional
 
 from ...domain.interfaces.pull_request_metadata_repository_interface import PullRequestMetadataRepositoryInterface
 from ...domain.pull_request_basic_info import PullRequestBasicInfo
@@ -116,3 +116,20 @@ class PullRequestMetadataRepository(PullRequestMetadataRepositoryInterface):
                 continue
 
         return metadata_list
+
+    def find_by_pr_number(self, output_directory: Path, repository_id: RepositoryIdentifier, pr_number: int) -> Optional[PullRequestMetadata]:
+        """Find a specific PullRequestMetadata by PR number.
+
+        Args:
+            output_directory: Base output directory
+            repository_id: Repository identifier
+            pr_number: Pull request number
+
+        Returns:
+            PullRequestMetadata if found, None otherwise
+        """
+        all_metadata = self.find_all_by_repository(output_directory, repository_id)
+        for metadata in all_metadata:
+            if metadata.number == pr_number:
+                return metadata
+        return None
