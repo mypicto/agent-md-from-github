@@ -72,6 +72,12 @@ python scripts/src/fetch.py --repo "owner/repository" --from-date "2025-09-01" -
 python scripts/src/list_missing_summaries.py --repo "owner/repository"
 ```
 
+### PRコメントの出力
+
+```bash
+python scripts/src/get_comments.py --repo "owner/repository" --pr PR-123
+```
+
 ## 📖 詳細な使用方法
 
 ### 利用可能なコマンド
@@ -81,6 +87,7 @@ python scripts/src/list_missing_summaries.py --repo "owner/repository"
 | `fetch.py` | PRレビューコメントの収集 |
 | `list_missing_summaries.py` | サマリーが作成されていないレビューコメントの検索 |
 | `delete_summaries.py` | サマリーデータの削除 |
+| `get_comments.py` | 指定PRのレビューコメントをMarkdown形式で出力 |
 | `auth.py` | GitHubトークンの管理 |
 
 ### fetch.py オプション
@@ -107,6 +114,14 @@ python scripts/src/list_missing_summaries.py --repo "owner/repository"
 | オプション | 必須 | 説明 | デフォルト |
 |-----------|------|------|-----------|
 | `--repo` | ❌ | リポジトリ名（`owner/repo`形式、全リポジトリ対象時は未指定） | - |
+| `--output-dir` | ❌ | 出力ディレクトリ | `pullrequests` |
+
+### get_comments.py オプション
+
+| オプション | 必須 | 説明 | デフォルト |
+|-----------|------|------|-----------|
+| `--repo` | ✅ | リポジトリ名（`owner/repo`形式） | - |
+| `--pr` | ✅ | PR番号（`PR-<number>`形式） | - |
 | `--output-dir` | ❌ | 出力ディレクトリ | `pullrequests` |
 
 ### auth.py オプション
