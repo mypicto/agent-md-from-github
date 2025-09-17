@@ -79,7 +79,7 @@ python scripts/src/list_missing_summaries.py --repo "owner/repository"
 | コマンド | 説明 |
 |----------|------|
 | `fetch.py` | PRレビューコメントの収集 |
-| `list_missing_summaries.py` | サマリーデータの欠如チェック |
+| `list_missing_summaries.py` | サマリーが作成されていないレビューコメントの検索 |
 | `delete_summaries.py` | サマリーデータの削除 |
 | `auth.py` | GitHubトークンの管理 |
 

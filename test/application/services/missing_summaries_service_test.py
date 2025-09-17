@@ -35,7 +35,16 @@ class TestMissingSummariesService(unittest.TestCase):
             title="Test PR 1",
             closed_at=datetime(2025, 9, 1),
             is_merged=True,
-            review_comments=[],
+            review_comments=[ReviewComment(
+                comment_id=1,
+                file_path="file1.py",
+                position=1,
+                commit_id="abc123",
+                author="user1",
+                created_at=datetime(2025, 9, 1),
+                body="comment1",
+                diff_context="diff1"
+            )],  # 1 comment
             repository_id=self.repo_id
         )
         
@@ -44,7 +53,34 @@ class TestMissingSummariesService(unittest.TestCase):
             title="Test PR 2",
             closed_at=datetime(2025, 9, 2),
             is_merged=False,
-            review_comments=[],
+            review_comments=[ReviewComment(
+                comment_id=2,
+                file_path="file2.py",
+                position=2,
+                commit_id="def456",
+                author="user2",
+                created_at=datetime(2025, 9, 2),
+                body="comment2",
+                diff_context="diff2"
+            ), ReviewComment(
+                comment_id=3,
+                file_path="file3.py",
+                position=3,
+                commit_id="ghi789",
+                author="user3",
+                created_at=datetime(2025, 9, 2),
+                body="comment3",
+                diff_context="diff3"
+            )],  # 2 comments
+            repository_id=self.repo_id
+        )
+        
+        self.metadata_no_comments = PullRequestMetadata(
+            number=789,
+            title="Test PR No Comments",
+            closed_at=datetime(2025, 9, 3),
+            is_merged=True,
+            review_comments=[],  # No comments
             repository_id=self.repo_id
         )
     
@@ -88,5 +124,27 @@ class TestMissingSummariesService(unittest.TestCase):
         
         result = self.service.list_missing_summaries(self.repo_id, self.output_dir)
         
-        self.assertEqual(result, [123, 456])
+        self.assertEqual(result, [456, 123])  # Sorted by comment count desc
+        self.assertEqual(self.summary_repo.exists_summary.call_count, 2)
+    
+    def test_list_missing_summaries_レビューコメントゼロ除外(self):
+        """Test that PRs with no review comments are filtered out."""
+        self.pr_metadata_repo.find_all_by_repository.return_value = [self.metadata_no_comments, self.metadata1]
+        self.summary_repo.exists_summary.return_value = False  # Both missing summaries
+        
+        result = self.service.list_missing_summaries(self.repo_id, self.output_dir)
+        
+        # Should filter out metadata_no_comments (0 comments), keep metadata1 (1 comment)
+        self.assertEqual(result, [123])
+        self.assertEqual(self.summary_repo.exists_summary.call_count, 1)  # Only called for filtered metadata
+    
+    def test_list_missing_summaries_レビューコメント件数降順ソート(self):
+        """Test that results are sorted by review comment count in descending order."""
+        self.pr_metadata_repo.find_all_by_repository.return_value = [self.metadata1, self.metadata2]  # 1 and 2 comments
+        self.summary_repo.exists_summary.return_value = False  # Both missing summaries
+        
+        result = self.service.list_missing_summaries(self.repo_id, self.output_dir)
+        
+        # Should sort by comment count desc: metadata2 (2 comments), metadata1 (1 comment)
+        self.assertEqual(result, [456, 123])
         self.assertEqual(self.summary_repo.exists_summary.call_count, 2)
