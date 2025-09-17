@@ -21,14 +21,12 @@ class TestPRReviewCollectionService(unittest.TestCase):
     def setUp(self):
         """Set up test fixtures."""
         self.github_repo = Mock()
-        self.output_formatter = Mock()
-        self.output_writer = Mock()
+        self.pr_metadata_repo = Mock()
         self.comment_filter = AICommentFilter()
         
         self.service = PRReviewCollectionService(
             github_repository=self.github_repo,
-            output_formatter=self.output_formatter,
-            output_writer=self.output_writer,
+            pr_metadata_repository=self.pr_metadata_repo,
             comment_filter=self.comment_filter
         )
         
@@ -70,35 +68,6 @@ class TestPRReviewCollectionService(unittest.TestCase):
             review_comments=[self.copilot_comment, self.human_comment],
             repository_id=self.repo_id
         )
-    
-    def test_process_single_pr_filters_comments(self):
-        """Test that _process_single_pr filters comments before formatting."""
-        # Mock the formatter and writer
-        self.output_formatter.format_comments.return_value = '{"test": "data"}'
-        self.output_formatter.format_diff_excerpt.return_value = "# Test diff"
-        self.output_writer.write_pr_data.return_value = None
-        
-        # Process the PR
-        result = self.service._process_single_pr(self.pr_metadata, self.output_dir)
-        
-        # Verify the result
-        self.assertTrue(result)
-        
-        # Verify that formatter was called with filtered metadata
-        self.assertEqual(self.output_formatter.format_comments.call_count, 1)
-        self.assertEqual(self.output_formatter.format_diff_excerpt.call_count, 1)
-        
-        # Get the filtered metadata passed to formatter
-        filtered_metadata = self.output_formatter.format_comments.call_args[0][0]
-        
-        # Verify that only human comment remains
-        self.assertEqual(len(filtered_metadata.review_comments), 1)
-        self.assertEqual(filtered_metadata.review_comments[0].author, "human")
-        
-        # Verify writer was called with filtered metadata
-        self.assertEqual(self.output_writer.write_pr_data.call_count, 1)
-        writer_metadata = self.output_writer.write_pr_data.call_args[0][0]
-        self.assertEqual(len(writer_metadata.review_comments), 1)
 
 
 if __name__ == "__main__":

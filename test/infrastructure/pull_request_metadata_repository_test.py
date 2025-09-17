@@ -115,3 +115,133 @@ class TestPullRequestMetadataRepository:
 
             # Assert
             assert result is False
+
+    def test_find_all_by_repository_リポジトリの全PRメタデータを正しく読み込む(self):
+        """Test that find_all_by_repository loads all PR metadata correctly."""
+        # Arrange
+        repo = PullRequestMetadataRepository()
+        repo_id = RepositoryIdentifier(owner="test-owner", name="test-repo")
+
+        # Create test data
+        pr1_metadata = PullRequestMetadata(
+            number=123,
+            title="Test PR 1",
+            closed_at=datetime(2023, 10, 1, 12, 0, 0),
+            is_merged=True,
+            review_comments=[
+                ReviewComment(
+                    comment_id=1,
+                    file_path="file1.py",
+                    position=None,
+                    commit_id="commit1",
+                    author="user1",
+                    created_at=datetime(2023, 9, 30, 10, 0, 0),
+                    body="Comment 1",
+                    diff_context="@@ -1 +1 @@\n-old1\n+new1"
+                )
+            ],
+            repository_id=repo_id
+        )
+
+        pr2_metadata = PullRequestMetadata(
+            number=456,
+            title="Test PR 2",
+            closed_at=datetime(2023, 10, 2, 14, 0, 0),
+            is_merged=False,
+            review_comments=[
+                ReviewComment(
+                    comment_id=2,
+                    file_path="file2.py",
+                    position=None,
+                    commit_id="commit2",
+                    author="user2",
+                    created_at=datetime(2023, 10, 1, 11, 0, 0),
+                    body="Comment 2",
+                    diff_context="@@ -2 +2 @@\n-old2\n+new2"
+                )
+            ],
+            repository_id=repo_id
+        )
+
+        with tempfile.TemporaryDirectory() as temp_dir:
+            output_dir = Path(temp_dir)
+
+            # Save test data
+            repo.save(pr1_metadata, output_dir)
+            repo.save(pr2_metadata, output_dir)
+
+            # Act
+            result = repo.find_all_by_repository(output_dir, repo_id)
+
+            # Assert
+            assert len(result) == 2
+            # Sort by PR number for consistent comparison
+            result.sort(key=lambda x: x.number)
+
+            assert result[0].number == 123
+            assert result[0].title == "Test PR 1"
+            assert result[0].closed_at == datetime(2023, 10, 1, 12, 0, 0)
+            assert result[0].is_merged is True
+            assert len(result[0].review_comments) == 1
+            assert result[0].review_comments[0].body == "Comment 1"
+            assert result[0].repository_id.owner == "test-owner"
+            assert result[0].repository_id.name == "test-repo"
+
+            assert result[1].number == 456
+            assert result[1].title == "Test PR 2"
+            assert result[1].closed_at == datetime(2023, 10, 2, 14, 0, 0)
+            assert result[1].is_merged is False
+            assert len(result[1].review_comments) == 1
+            assert result[1].review_comments[0].body == "Comment 2"
+
+    def test_find_all_by_repository_ディレクトリが存在しない場合空リストを返す(self):
+        """Test that find_all_by_repository returns empty list when directory doesn't exist."""
+        # Arrange
+        repo = PullRequestMetadataRepository()
+        repo_id = RepositoryIdentifier(owner="test-owner", name="test-repo")
+
+        with tempfile.TemporaryDirectory() as temp_dir:
+            output_dir = Path(temp_dir)
+
+            # Act
+            result = repo.find_all_by_repository(output_dir, repo_id)
+
+            # Assert
+            assert result == []
+
+    def test_find_all_by_repository_無効なJSONファイルをスキップする(self):
+        """Test that find_all_by_repository skips invalid JSON files."""
+        # Arrange
+        repo = PullRequestMetadataRepository()
+        repo_id = RepositoryIdentifier(owner="test-owner", name="test-repo")
+
+        with tempfile.TemporaryDirectory() as temp_dir:
+            output_dir = Path(temp_dir)
+            repo_dir = output_dir / "test-owner" / "test-repo" / "2023-10-01"
+            repo_dir.mkdir(parents=True, exist_ok=True)
+
+            # Create valid JSON file
+            valid_file = repo_dir / "PR-123-metadata.json"
+            valid_data = {
+                "number": 123,
+                "title": "Valid PR",
+                "closed_at": "2023-10-01T12:00:00",
+                "is_merged": True,
+                "review_comments": [],
+                "repository_id": {"owner": "test-owner", "name": "test-repo"}
+            }
+            with open(valid_file, "w", encoding="utf-8") as f:
+                json.dump(valid_data, f)
+
+            # Create invalid JSON file
+            invalid_file = repo_dir / "PR-456-metadata.json"
+            with open(invalid_file, "w", encoding="utf-8") as f:
+                f.write("invalid json content")
+
+            # Act
+            result = repo.find_all_by_repository(output_dir, repo_id)
+
+            # Assert
+            assert len(result) == 1
+            assert result[0].number == 123
+            assert result[0].title == "Valid PR"

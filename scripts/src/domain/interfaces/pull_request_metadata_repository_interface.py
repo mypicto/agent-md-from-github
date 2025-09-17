@@ -4,9 +4,11 @@ Interface for PullRequestMetadata repository.
 
 from abc import ABC, abstractmethod
 from pathlib import Path
+from typing import List
 
 from ..pull_request_basic_info import PullRequestBasicInfo
 from ..pull_request_metadata import PullRequestMetadata
+from ..repository_identifier import RepositoryIdentifier
 
 
 class PullRequestMetadataRepositoryInterface(ABC):
@@ -32,5 +34,18 @@ class PullRequestMetadataRepositoryInterface(ABC):
 
         Returns:
             True if file exists
+        """
+        pass
+
+    @abstractmethod
+    def find_all_by_repository(self, output_directory: Path, repository_id: RepositoryIdentifier) -> List[PullRequestMetadata]:
+        """Find all PullRequestMetadata for the given repository.
+
+        Args:
+            output_directory: Base output directory
+            repository_id: Repository identifier
+
+        Returns:
+            List of PullRequestMetadata
         """
         pass

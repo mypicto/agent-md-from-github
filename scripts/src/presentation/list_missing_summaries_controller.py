@@ -53,14 +53,14 @@ class ListMissingSummariesController:
             service = ServiceFactory.create_missing_summaries_service()
             
             # Execute
-            missing_files = service.list_missing_summaries(repository_id, output_directory)
+            missing_numbers = service.list_missing_summaries(repository_id, output_directory)
             
             # Output
-            if not missing_files:
+            if not missing_numbers:
                 print("No missing summary files found.")
                 return
-            for file_path in missing_files:
-                print(file_path)
+            for number in missing_numbers:
+                print(f"PR-{number}")
         
         except ValueError as e:
             print(f"Error: {e}")

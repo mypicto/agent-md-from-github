@@ -5,10 +5,12 @@ PullRequestMetadata repository implementation for JSON persistence.
 import json
 from dataclasses import asdict
 from pathlib import Path
+from typing import List
 
 from ...domain.interfaces.pull_request_metadata_repository_interface import PullRequestMetadataRepositoryInterface
 from ...domain.pull_request_basic_info import PullRequestBasicInfo
 from ...domain.pull_request_metadata import PullRequestMetadata
+from ...domain.repository_identifier import RepositoryIdentifier
 
 
 class PullRequestMetadataRepository(PullRequestMetadataRepositoryInterface):
@@ -60,3 +62,57 @@ class PullRequestMetadataRepository(PullRequestMetadataRepositoryInterface):
         date_str = basic_info.closed_at.strftime("%Y-%m-%d")
         file_path = output_directory / basic_info.repository_id.owner / basic_info.repository_id.name / date_str / f"PR-{basic_info.number}-metadata.json"
         return file_path.exists()
+
+    def find_all_by_repository(self, output_directory: Path, repository_id: RepositoryIdentifier) -> List[PullRequestMetadata]:
+        """Find all PullRequestMetadata for the given repository.
+
+        Args:
+            output_directory: Base output directory
+            repository_id: Repository identifier
+
+        Returns:
+            List of PullRequestMetadata
+        """
+        repo_path = output_directory / repository_id.owner / repository_id.name
+        if not repo_path.exists():
+            return []
+
+        metadata_list = []
+        for json_file in repo_path.rglob("PR-*-metadata.json"):
+            try:
+                with open(json_file, "r", encoding="utf-8") as f:
+                    data = json.load(f)
+
+                # Deserialize
+                from datetime import datetime
+                from ...domain.review_comment import ReviewComment
+
+                metadata = PullRequestMetadata(
+                    number=data["number"],
+                    title=data["title"],
+                    closed_at=datetime.fromisoformat(data["closed_at"]),
+                    is_merged=data["is_merged"],
+                    review_comments=[
+                        ReviewComment(
+                            comment_id=comment["comment_id"],
+                            file_path=comment["file_path"],
+                            position=comment.get("position"),
+                            commit_id=comment["commit_id"],
+                            author=comment["author"],
+                            created_at=datetime.fromisoformat(comment["created_at"]),
+                            body=comment["body"],
+                            diff_context=comment["diff_context"]
+                        )
+                        for comment in data["review_comments"]
+                    ],
+                    repository_id=RepositoryIdentifier(
+                        owner=data["repository_id"]["owner"],
+                        name=data["repository_id"]["name"]
+                    )
+                )
+                metadata_list.append(metadata)
+            except (json.JSONDecodeError, KeyError, ValueError):
+                # Skip invalid files
+                continue
+
+        return metadata_list

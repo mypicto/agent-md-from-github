@@ -13,6 +13,7 @@ from ..application.services.delete_summaries_service import DeleteSummariesServi
 from .repositories.github_repository import GitHubRepository
 from .repositories.pull_request_file_set_repository import PullRequestFileSetRepository
 from .repositories.pull_request_metadata_repository import PullRequestMetadataRepository
+from .repositories.pull_request_summary_repository import PullRequestSummaryRepository
 from .services.timezone_converter import TimezoneConverter
 from .file_system_deleter import FileSystemDeleter
 from .filters.ai_comment_filter import AICommentFilter
@@ -96,8 +97,9 @@ class ServiceFactory:
         Returns:
             Configured missing summaries service
         """
-        file_set_repository = PullRequestFileSetRepository()
-        return MissingSummariesService(file_set_repository)
+        pr_metadata_repository = PullRequestMetadataRepository()
+        summary_repository = PullRequestSummaryRepository()
+        return MissingSummariesService(pr_metadata_repository, summary_repository)
     
     @staticmethod
     def create_delete_summaries_service() -> DeleteSummariesService:

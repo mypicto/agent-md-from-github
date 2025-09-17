@@ -18,6 +18,7 @@ from .application.services import (
 from .domain.interfaces import (
     GitHubRepositoryInterface,
     PullRequestMetadataRepositoryInterface,
+    PullRequestSummaryRepositoryInterface,
     TimezoneConverterInterface
 )
 
@@ -29,7 +30,7 @@ from .domain.review_comment import ReviewComment
 
 # Infrastructure layer
 from .infrastructure.service_factory import ServiceFactory
-from .infrastructure.repositories import GitHubRepository, PullRequestMetadataRepository
+from .infrastructure.repositories import GitHubRepository, PullRequestMetadataRepository, PullRequestSummaryRepository
 from .infrastructure.services import TimezoneConverter
 
 
@@ -47,6 +48,7 @@ __all__ = [
     # Domain layer - interfaces
     "GitHubRepositoryInterface",
     "PullRequestMetadataRepositoryInterface",
+    "PullRequestSummaryRepositoryInterface",
     "TimezoneConverterInterface",
     
     # Domain layer - value objects
@@ -59,6 +61,7 @@ __all__ = [
         # Infrastructure layer
     "GitHubRepository",
     "PullRequestMetadataRepository",
+    "PullRequestSummaryRepository",
     "ServiceFactory",
     "TimezoneConverter"
 ]
