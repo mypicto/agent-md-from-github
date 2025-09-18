@@ -127,29 +127,9 @@ class ServiceFactory:
     
     @staticmethod
     def create_review_summary_service(
-        github_token: str,
-        timezone: str = "Asia/Tokyo",
         logger: Optional[logging.Logger] = None
     ) -> ReviewSummaryService:
-        """Create a review summary service with all dependencies.
-        
-        Args:
-            github_token: GitHub personal access token
-            timezone: Target timezone for date conversion
-            logger: Optional logger instance
-            
-        Returns:
-            Configured review summary service
-        """
-        # Create GitHub client
-        github_client = Github(github_token)
-        
-        # Create timezone converter
-        timezone_converter = TimezoneConverter(timezone)
-        
-        # Create GitHub repository
-        github_repository = GitHubRepository(github_client, timezone_converter)
-        
+        """Create a review summary service with all dependencies."""
         # Create review summary repository
         review_summary_repository = ReviewSummaryRepository()
         

@@ -48,20 +48,9 @@ class ReviewSummaryController:
         )
         
         self._parser.add_argument(
-            "--summary",
+            "--file",
             required=True,
-            help="Summary text (supports multi-line)"
-        )
-        
-        self._parser.add_argument(
-            "--token",
-            help="GitHub personal access token (or set GITHUB_TOKEN environment variable)"
-        )
-        
-        self._parser.add_argument(
-            "--timezone",
-            default="Asia/Tokyo",
-            help="Timezone for operations (default: Asia/Tokyo)"
+            help="Path to summary file (Markdown format)"
         )
     
     def run(self, args: list[str] = None) -> None:
@@ -73,32 +62,28 @@ class ReviewSummaryController:
         parsed_args = self._parser.parse_args(args)
         
         try:
-            # Get GitHub token
-            token = parsed_args.token or os.getenv("GITHUB_TOKEN")
-            if not token:
-                raise PRReviewCollectionError(
-                    "GitHub token not provided. Use --token or set GITHUB_TOKEN environment variable"
-                )
-            
             # Parse repository identifier
             repository_id = RepositoryIdentifier.from_string(parsed_args.repo)
             
+            # Read summary from file
+            summary_text = Path(parsed_args.file).read_text(encoding='utf-8')
+            
             # Create service
-            service = ServiceFactory.create_review_summary_service(
-                github_token=token,
-                timezone=parsed_args.timezone
-            )
+            service = ServiceFactory.create_review_summary_service()
             
             # Set summary
             service.set_summary(
                 repository_id=repository_id,
                 pr_number=parsed_args.pr,
                 priority=parsed_args.priority,
-                summary=parsed_args.summary
+                summary=summary_text
             )
             
             print(f"Successfully saved summary for PR #{parsed_args.pr} in {parsed_args.repo}")
             
+        except FileNotFoundError:
+            print(f"Error: File not found: {parsed_args.file}", file=sys.stderr)
+            sys.exit(1)
         except PRReviewCollectionError as e:
             print(f"Error: {str(e)}", file=sys.stderr)
             sys.exit(1)

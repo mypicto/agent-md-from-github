@@ -132,7 +132,7 @@ python scripts/src/get_comments.py --repo "owner/repository" --pr PR-123
 | `--repo` | ✅ | リポジトリ名（`owner/repo`形式） | - |
 | `--pr` | ✅ | PR番号 | - |
 | `--priority` | ✅ | 優先度（`high`, `middle`, `low`） | - |
-| `--summary` | ✅ | 要約テキスト（複数行対応） | - |
+| `--file` | ✅ | 要約ファイルのパス（Markdown形式） | - |
 
 ### auth.py オプション
 
@@ -151,9 +151,10 @@ pullrequests/
 │   └── repository/
 │       ├── 2025-09-01/
 │       │   ├── PR-123-metadata.json
-│       │   └── PR-123-summary.md
-│       └── 2025-09-02/
-│           ├── PR-456-metadata.json
+│       ├── 2025-09-02/
+│       │   ├── PR-456-metadata.json
+│       └── summaries/
+│           ├── PR-123-summary.md
 │           └── PR-456-summary.md
 ```
 
