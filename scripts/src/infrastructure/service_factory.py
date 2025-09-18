@@ -14,8 +14,7 @@ from ..application.services.comments_service import CommentsService
 from ..application.services.review_summary_service import ReviewSummaryService
 from .repositories.github_repository import GitHubRepository
 from .repositories.pull_request_metadata_repository import PullRequestMetadataRepository
-from .repositories.pull_request_summary_repository import PullRequestSummaryRepository
-from .repositories.review_summary_repository import ReviewSummaryRepository
+from .repositories.summary_repository import SummaryRepository
 from .services.timezone_converter import TimezoneConverter
 from .file_system_deleter import FileSystemDeleter
 from .filters.ai_comment_filter import AICommentFilter
@@ -101,7 +100,7 @@ class ServiceFactory:
             Configured missing summaries service
         """
         pr_metadata_repository = PullRequestMetadataRepository()
-        summary_repository = PullRequestSummaryRepository()
+        summary_repository = SummaryRepository()
         return MissingSummariesService(pr_metadata_repository, summary_repository)
     
     @staticmethod
@@ -131,7 +130,7 @@ class ServiceFactory:
     ) -> ReviewSummaryService:
         """Create a review summary service with all dependencies."""
         # Create review summary repository
-        review_summary_repository = ReviewSummaryRepository()
+        review_summary_repository = SummaryRepository()
         
         # Create PR metadata repository for validation
         pr_metadata_repository = PullRequestMetadataRepository()

@@ -7,7 +7,7 @@ from pathlib import Path
 
 from ...domain.review_summary import ReviewSummary
 from ...domain.repository_identifier import RepositoryIdentifier
-from ...domain.interfaces.review_summary_repository_interface import ReviewSummaryRepositoryInterface
+from ...domain.interfaces.summary_repository_interface import SummaryRepositoryInterface
 from ...domain.interfaces.pull_request_metadata_repository_interface import PullRequestMetadataRepositoryInterface
 from ..exceptions.pr_review_collection_error import PRReviewCollectionError
 
@@ -17,7 +17,7 @@ class ReviewSummaryService:
     
     def __init__(
         self,
-        review_summary_repository: ReviewSummaryRepositoryInterface,
+        review_summary_repository: SummaryRepositoryInterface,
         pr_metadata_repository: PullRequestMetadataRepositoryInterface
     ):
         """Initialize review summary service.

@@ -1,17 +1,32 @@
 """
-Interface for review summary repository.
+Interface for managing PR summaries.
 """
 
 from abc import ABC, abstractmethod
+from pathlib import Path
 from typing import Optional
 
+from ..pull_request_metadata import PullRequestMetadata
 from ..review_summary import ReviewSummary
 from ..repository_identifier import RepositoryIdentifier
 
 
-class ReviewSummaryRepositoryInterface(ABC):
-    """Interface for managing review summaries."""
-    
+class SummaryRepositoryInterface(ABC):
+    """Interface for managing PR summaries."""
+
+    @abstractmethod
+    def exists_summary(self, metadata: PullRequestMetadata, output_directory: Path) -> bool:
+        """Check if summary file exists for the given PR metadata.
+
+        Args:
+            metadata: The PR metadata
+            output_directory: Base output directory
+
+        Returns:
+            True if summary file exists
+        """
+        pass
+
     @abstractmethod
     def save(self, summary: ReviewSummary) -> None:
         """Save a review summary.

@@ -69,7 +69,7 @@ class TestServiceFactory:
     def test_create_missing_summaries_service_正常作成_サービスが作成される(self):
         """Test create_missing_summaries_service creates service correctly."""
         with patch('scripts.src.infrastructure.service_factory.PullRequestMetadataRepository') as mock_metadata_repo_class:
-            with patch('scripts.src.infrastructure.service_factory.PullRequestSummaryRepository') as mock_summary_repo_class:
+            with patch('scripts.src.infrastructure.service_factory.SummaryRepository') as mock_summary_repo_class:
                 with patch('scripts.src.infrastructure.service_factory.MissingSummariesService') as mock_service_class:
                     mock_metadata_repo_instance = MagicMock()
                     mock_metadata_repo_class.return_value = mock_metadata_repo_instance
@@ -86,3 +86,24 @@ class TestServiceFactory:
                     mock_metadata_repo_class.assert_called_once()
                     mock_summary_repo_class.assert_called_once()
                     mock_service_class.assert_called_once_with(mock_metadata_repo_instance, mock_summary_repo_instance)
+
+    def test_create_review_summary_service_正常作成_サービスが作成される(self):
+        """Test create_review_summary_service creates service correctly."""
+        with patch('scripts.src.infrastructure.service_factory.SummaryRepository') as mock_summary_repo_class:
+            with patch('scripts.src.infrastructure.service_factory.PullRequestMetadataRepository') as mock_metadata_repo_class:
+                with patch('scripts.src.infrastructure.service_factory.ReviewSummaryService') as mock_service_class:
+                    mock_summary_repo_instance = MagicMock()
+                    mock_summary_repo_class.return_value = mock_summary_repo_instance
+                    
+                    mock_metadata_repo_instance = MagicMock()
+                    mock_metadata_repo_class.return_value = mock_metadata_repo_instance
+
+                    mock_service_instance = MagicMock()
+                    mock_service_class.return_value = mock_service_instance
+
+                    service = ServiceFactory.create_review_summary_service()
+
+                    assert service == mock_service_instance
+                    mock_summary_repo_class.assert_called_once()
+                    mock_metadata_repo_class.assert_called_once()
+                    mock_service_class.assert_called_once_with(mock_summary_repo_instance, mock_metadata_repo_instance)

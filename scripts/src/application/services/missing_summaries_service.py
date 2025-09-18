@@ -8,13 +8,13 @@ from pathlib import Path
 from ...domain.repository_identifier import RepositoryIdentifier
 from ...domain.pull_request_metadata import PullRequestMetadata
 from ...domain.interfaces.pull_request_metadata_repository_interface import PullRequestMetadataRepositoryInterface
-from ...domain.interfaces.pull_request_summary_repository_interface import PullRequestSummaryRepositoryInterface
+from ...domain.interfaces.summary_repository_interface import SummaryRepositoryInterface
 
 
 class MissingSummariesService:
     """Application service for listing missing summaries."""
     
-    def __init__(self, pr_metadata_repository: PullRequestMetadataRepositoryInterface, summary_repository: PullRequestSummaryRepositoryInterface):
+    def __init__(self, pr_metadata_repository: PullRequestMetadataRepositoryInterface, summary_repository: SummaryRepositoryInterface):
         """Initialize missing summaries service.
         
         Args:
