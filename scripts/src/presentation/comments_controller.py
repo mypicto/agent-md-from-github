@@ -55,14 +55,17 @@ class CommentsController:
             repository_id = RepositoryIdentifier.from_string(parsed_args.repo)
             output_directory = Path(parsed_args.output_dir)
             
-            # Parse PR number from 'PR-<number>' format
+            # Parse PR number from 'PR-<number>' format and convert to int
             pr_arg = parsed_args.pr
             if not pr_arg.startswith("PR-"):
                 raise ValueError(f"PR number must be in format 'PR-<number>', got: {pr_arg}")
-            try:
-                pr_number = pr_arg[3:]  # Remove 'PR-' prefix
-            except IndexError:
+            number_part = pr_arg[3:]
+            if not number_part:
                 raise ValueError(f"Invalid PR format: {pr_arg}")
+            try:
+                pr_number = int(number_part)
+            except ValueError:
+                raise ValueError(f"PR number must be numeric after 'PR-': got '{number_part}'")
             
             # Create service
             service = ServiceFactory.create_comments_service()
