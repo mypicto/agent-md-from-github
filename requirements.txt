@@ -10,3 +10,6 @@ python-dateutil>=2.8.2
 
 # Secure credential storage
 keyring>=24.0.0
+
+# YAML support for better readability
+PyYAML>=6.0

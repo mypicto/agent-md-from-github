@@ -2,7 +2,7 @@
 Tests for ReviewSummaryRepository.
 """
 
-import json
+import yaml
 import tempfile
 from pathlib import Path
 import pytest
@@ -31,11 +31,11 @@ class TestReviewSummaryRepository:
             repo.save(summary)
             
             # Assert
-            expected_path = Path(temp_dir) / "testowner" / "testrepo" / "summaries" / "PR-123.json"
+            expected_path = Path(temp_dir) / "testowner" / "testrepo" / "summaries" / "PR-123.yml"
             assert expected_path.exists()
             
             with open(expected_path, 'r') as f:
-                data = json.load(f)
+                data = yaml.safe_load(f)
             
             assert data["repository_id"]["owner"] == "testowner"
             assert data["pr_number"] == 123
@@ -52,7 +52,7 @@ class TestReviewSummaryRepository:
             # Create file manually
             summaries_dir = Path(temp_dir) / "testowner" / "testrepo" / "summaries"
             summaries_dir.mkdir(parents=True)
-            file_path = summaries_dir / "PR-123.json"
+            file_path = summaries_dir / "PR-123.yml"
             data = {
                 "repository_id": {"owner": "testowner", "name": "testrepo"},
                 "pr_number": 123,
@@ -60,7 +60,7 @@ class TestReviewSummaryRepository:
                 "summary": "Test summary"
             }
             with open(file_path, 'w') as f:
-                json.dump(data, f)
+                yaml.dump(data, f, default_flow_style=False, allow_unicode=True)
             
             # Act
             result = repo.get(repo_id, 123)

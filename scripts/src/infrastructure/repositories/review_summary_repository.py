@@ -2,7 +2,7 @@
 File system implementation of review summary repository.
 """
 
-import json
+import yaml
 from pathlib import Path
 from typing import Optional
 
@@ -32,7 +32,7 @@ class ReviewSummaryRepository(ReviewSummaryRepositoryInterface):
         summaries_dir = repo_dir / "summaries"
         summaries_dir.mkdir(parents=True, exist_ok=True)
         
-        file_path = summaries_dir / f"PR-{summary.pr_number}.json"
+        file_path = summaries_dir / f"PR-{summary.pr_number}.yml"
         
         data = {
             "repository_id": {
@@ -45,7 +45,7 @@ class ReviewSummaryRepository(ReviewSummaryRepositoryInterface):
         }
         
         with open(file_path, 'w', encoding='utf-8') as f:
-            json.dump(data, f, ensure_ascii=False, indent=2)
+            yaml.dump(data, f, default_flow_style=False, allow_unicode=True, default_style='|')
     
     def get(self, repository_id: RepositoryIdentifier, pr_number: int) -> Optional[ReviewSummary]:
         """Get a review summary from file.
@@ -59,14 +59,14 @@ class ReviewSummaryRepository(ReviewSummaryRepositoryInterface):
         """
         repo_dir = self._base_directory / repository_id.owner / repository_id.name
         summaries_dir = repo_dir / "summaries"
-        file_path = summaries_dir / f"PR-{pr_number}.json"
+        file_path = summaries_dir / f"PR-{pr_number}.yml"
         
         if not file_path.exists():
             return None
         
         try:
             with open(file_path, 'r', encoding='utf-8') as f:
-                data = json.load(f)
+                data = yaml.safe_load(f)
             
             return ReviewSummary(
                 repository_id=RepositoryIdentifier(
@@ -77,5 +77,5 @@ class ReviewSummaryRepository(ReviewSummaryRepositoryInterface):
                 priority=data["priority"],
                 summary=data["summary"]
             )
-        except (json.JSONDecodeError, KeyError, ValueError):
+        except (yaml.YAMLError, KeyError, ValueError):
             return None
