@@ -86,7 +86,6 @@ python scripts/src/get_comments.py --repo "owner/repository" --pr PR-123
 |----------|------|
 | `fetch.py` | PRレビューコメントの収集 |
 | `list_missing_summaries.py` | サマリーが作成されていないレビューコメントの検索 |
-| `delete_summaries.py` | サマリーデータの削除 |
 | `get_comments.py` | 指定PRのレビューコメントをMarkdown形式で出力 |
 | `set_summary.py` | PRのレビュー要約を設定 |
 | `auth.py` | GitHubトークンの管理 |
@@ -108,13 +107,6 @@ python scripts/src/get_comments.py --repo "owner/repository" --pr PR-123
 | オプション | 必須 | 説明 | デフォルト |
 |-----------|------|------|-----------|
 | `--repo` | ✅ | リポジトリ名（`owner/repo`形式） | - |
-| `--output-dir` | ❌ | 出力ディレクトリ | `pullrequests` |
-
-### delete_summaries.py オプション
-
-| オプション | 必須 | 説明 | デフォルト |
-|-----------|------|------|-----------|
-| `--repo` | ❌ | リポジトリ名（`owner/repo`形式、全リポジトリ対象時は未指定） | - |
 | `--output-dir` | ❌ | 出力ディレクトリ | `pullrequests` |
 
 ### get_comments.py オプション

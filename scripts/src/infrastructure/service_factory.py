@@ -9,14 +9,12 @@ from github import Github
 
 from ..application.services.pr_review_collection_service import PRReviewCollectionService
 from ..application.services.missing_summaries_service import MissingSummariesService
-from ..application.services.delete_summaries_service import DeleteSummariesService
 from ..application.services.comments_service import CommentsService
 from ..application.services.review_summary_service import ReviewSummaryService
 from .repositories.github_repository import GitHubRepository
 from .repositories.pull_request_metadata_repository import PullRequestMetadataRepository
 from .repositories.summary_repository import SummaryRepository
 from .services.timezone_converter import TimezoneConverter
-from .file_system_deleter import FileSystemDeleter
 from .filters.ai_comment_filter import AICommentFilter
 from ..presentation.markdown_formatter import MarkdownFormatter
 
@@ -102,16 +100,6 @@ class ServiceFactory:
         pr_metadata_repository = PullRequestMetadataRepository()
         summary_repository = SummaryRepository()
         return MissingSummariesService(pr_metadata_repository, summary_repository)
-    
-    @staticmethod
-    def create_delete_summaries_service() -> DeleteSummariesService:
-        """Create a delete summaries service with all dependencies.
-        
-        Returns:
-            Configured delete summaries service
-        """
-        file_deleter = FileSystemDeleter()
-        return DeleteSummariesService(file_deleter)
     
     @staticmethod
     def create_comments_service() -> CommentsService:
