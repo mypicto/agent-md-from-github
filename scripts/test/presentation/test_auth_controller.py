@@ -2,7 +2,6 @@
 Tests for AuthController.
 """
 
-import pytest
 from unittest.mock import patch, MagicMock
 from scripts.src.presentation.auth_controller import AuthController
 

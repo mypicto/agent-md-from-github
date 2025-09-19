@@ -2,9 +2,7 @@
 Test for CommentsController.
 """
 
-import pytest
 from unittest.mock import Mock, patch
-from pathlib import Path
 
 from scripts.src.presentation.comments_controller import CommentsController
 from scripts.src.application.exceptions.comments_service_error import CommentsServiceError

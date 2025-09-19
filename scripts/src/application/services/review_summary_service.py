@@ -49,7 +49,10 @@ class ReviewSummaryService:
             PRReviewCollectionError: If PR does not exist or other errors occur
         """
         # Validate PR exists by checking local metadata
-        pr_exists = self._pr_metadata_repository.find_by_pr_number(Path("pullrequests"), repository_id, pr_number)
+        try:
+            pr_exists = self._pr_metadata_repository.find_by_pr_number(Path("pullrequests"), repository_id, pr_number)
+        except Exception as e:
+            raise PRReviewCollectionError(f"Failed to retrieve PR metadata: {str(e)}")
         if not pr_exists:
             raise PRReviewCollectionError(f"PR #{pr_number} not found in local metadata for {repository_id.to_string()}")
         

@@ -2,7 +2,6 @@
 Test for MarkdownFormatter.
 """
 
-import pytest
 from datetime import datetime
 
 from scripts.src.presentation.markdown_formatter import MarkdownFormatter

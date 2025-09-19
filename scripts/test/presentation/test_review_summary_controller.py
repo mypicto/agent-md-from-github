@@ -2,9 +2,7 @@
 Test for ReviewSummaryController.
 """
 
-import pytest
 from unittest.mock import Mock, patch
-from pathlib import Path
 import tempfile
 import os
 

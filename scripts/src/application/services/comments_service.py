@@ -34,7 +34,7 @@ class CommentsService:
     def get_comments_markdown(
         self,
         repo_id: RepositoryIdentifier,
-        pr_number: str,
+        pr_number: int,
         output_directory: Path
     ) -> str:
         """Get comments markdown for the specified PR.

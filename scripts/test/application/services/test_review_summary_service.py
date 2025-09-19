@@ -36,7 +36,7 @@ class TestReviewSummaryService(unittest.TestCase):
             repository_id=repo_id
         )
         
-        self.pr_metadata_repo.find_all_by_repository.return_value = [pr_metadata]
+        self.pr_metadata_repo.find_by_pr_number.return_value = pr_metadata
         
         # Act
         self.service.set_summary(repo_id, 123, "high", "Test summary")
@@ -52,7 +52,7 @@ class TestReviewSummaryService(unittest.TestCase):
     def test_set_summary_PRが存在しない場合_PRReviewCollectionErrorが発生する(self):
         # Arrange
         repo_id = RepositoryIdentifier(owner="testowner", name="testrepo")
-        self.pr_metadata_repo.find_all_by_repository.return_value = []  # No PRs found
+        self.pr_metadata_repo.find_by_pr_number.return_value = None  # No PRs found
         
         # Act & Assert
         with self.assertRaises(PRReviewCollectionError):
@@ -61,7 +61,7 @@ class TestReviewSummaryService(unittest.TestCase):
     def test_set_summary_メタデータ取得エラーの場合_PRReviewCollectionErrorが発生する(self):
         # Arrange
         repo_id = RepositoryIdentifier(owner="testowner", name="testrepo")
-        self.pr_metadata_repo.find_all_by_repository.side_effect = Exception("Repository error")
+        self.pr_metadata_repo.find_by_pr_number.side_effect = Exception("Repository error")
         
         # Act & Assert
         with self.assertRaises(PRReviewCollectionError):

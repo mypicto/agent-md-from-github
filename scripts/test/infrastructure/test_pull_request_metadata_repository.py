@@ -7,8 +7,6 @@ import tempfile
 from datetime import datetime
 from pathlib import Path
 
-import pytest
-
 from scripts.src.domain.pull_request_basic_info import PullRequestBasicInfo
 from scripts.src.domain.pull_request_metadata import PullRequestMetadata
 from scripts.src.domain.repository_identifier import RepositoryIdentifier

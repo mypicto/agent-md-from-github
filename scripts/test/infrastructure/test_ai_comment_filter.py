@@ -4,7 +4,6 @@ Tests for AICommentFilter.
 
 import unittest
 from datetime import datetime
-from unittest.mock import Mock
 
 from scripts.src.domain.review_comment import ReviewComment
 from scripts.src.infrastructure.filters.ai_comment_filter import AICommentFilter

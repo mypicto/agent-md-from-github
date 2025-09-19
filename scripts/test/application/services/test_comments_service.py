@@ -9,11 +9,9 @@ from unittest.mock import Mock
 
 from scripts.src.application.services.comments_service import CommentsService
 from scripts.src.application.exceptions.comments_service_error import CommentsServiceError
-from scripts.src.domain.comment_thread import CommentThread
 from scripts.src.domain.pull_request_metadata import PullRequestMetadata
 from scripts.src.domain.repository_identifier import RepositoryIdentifier
 from scripts.src.domain.review_comment import ReviewComment
-from scripts.src.presentation.markdown_formatter import MarkdownFormatter
 
 
 class TestCommentsService:
@@ -22,7 +20,7 @@ class TestCommentsService:
     def test_get_comments_markdown_PRが見つからない_エラーが発生する(self):
         # Arrange
         mock_repo = Mock()
-        mock_repo.find_all_by_repository.return_value = []
+        mock_repo.find_by_pr_number.return_value = None
         mock_formatter = Mock()
         
         service = CommentsService(mock_repo, mock_formatter)
@@ -31,7 +29,7 @@ class TestCommentsService:
         
         # Act & Assert
         with pytest.raises(CommentsServiceError, match="PR not found: 123"):
-            service.get_comments_markdown(repo_id, "123", output_dir)
+            service.get_comments_markdown(repo_id, 123, output_dir)
 
     def test_get_comments_markdown_コメントがある_正しいMarkdownが返される(self):
         # Arrange
@@ -76,7 +74,7 @@ class TestCommentsService:
         )
         
         mock_repo = Mock()
-        mock_repo.find_all_by_repository.return_value = [pr_metadata]
+        mock_repo.find_by_pr_number.return_value = pr_metadata
         mock_formatter = Mock()
         mock_formatter.format.return_value = "formatted markdown"
         
@@ -85,7 +83,7 @@ class TestCommentsService:
         output_dir = Path("/tmp")
         
         # Act
-        result = service.get_comments_markdown(repo_id, "123", output_dir)
+        result = service.get_comments_markdown(repo_id, 123, output_dir)
         
         # Assert
         assert result == "formatted markdown"
