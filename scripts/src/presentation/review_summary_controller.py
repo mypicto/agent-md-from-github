@@ -3,14 +3,12 @@ Review summary controller for setting PR summaries.
 """
 
 import argparse
-import os
 import sys
 from pathlib import Path
 
 from ..application.exceptions.pr_review_collection_error import PRReviewCollectionError
 from ..domain.repository_identifier import RepositoryIdentifier
 from ..infrastructure.service_factory import ServiceFactory
-from ..infrastructure.services.token_manager import TokenManager
 
 
 class ReviewSummaryController:

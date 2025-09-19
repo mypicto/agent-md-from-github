@@ -1,5 +1,5 @@
 """
-Controller for listing missing PR summary files.
+Controller for popping comments from missing summaries.
 """
 
 import argparse
@@ -10,8 +10,8 @@ from ..domain.repository_identifier import RepositoryIdentifier
 from ..infrastructure.service_factory import ServiceFactory
 
 
-class ListMissingSummariesController:
-    """Controller for listing missing PR summary files."""
+class PopCommentsController:
+    """Controller for popping comments from missing summaries."""
     
     def __init__(self):
         """Initialize controller."""
@@ -20,8 +20,8 @@ class ListMissingSummariesController:
     def _setup_argument_parser(self) -> None:
         """Setup command-line argument parser."""
         self._parser = argparse.ArgumentParser(
-            description="List missing PR summary files",
-            prog="list_missing_summaries"
+            description="Get comments for the next missing summary PR",
+            prog="pop_comments"
         )
         self._parser.add_argument(
             "--repo",
@@ -50,21 +50,19 @@ class ListMissingSummariesController:
             output_directory = Path(parsed_args.output_dir)
             
             # Create service
-            service = ServiceFactory.create_missing_summaries_service()
+            service = ServiceFactory.create_pop_comments_service()
             
-            # Execute
-            missing_numbers = service.list_missing_summaries(repository_id, output_directory)
+            # Get comments markdown
+            markdown = service.get_next_missing_comments_markdown(
+                repository_id, output_directory
+            )
             
             # Output
-            if not missing_numbers:
-                print("No missing summary files found.")
-                return
-            for number in missing_numbers:
-                print(f"PR-{number}")
-        
+            print(markdown)
+            
         except ValueError as e:
-            print(f"Error: {e}")
+            print(f"Error: {e}", file=sys.stderr)
             sys.exit(1)
         except Exception as e:
-            print(f"Unexpected error: {e}")
+            print(f"Unexpected error: {e}", file=sys.stderr)
             sys.exit(1)

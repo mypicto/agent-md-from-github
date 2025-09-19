@@ -66,7 +66,7 @@ class CommentsService:
             thread.comments.sort(key=lambda c: c.created_at)
         
         # Format to markdown
-        markdown = self._markdown_formatter.format(threads)
+        markdown = self._markdown_formatter.format(pr_number, threads)
         
         return markdown
     

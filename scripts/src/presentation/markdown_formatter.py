@@ -9,17 +9,19 @@ from scripts.src.domain.comment_thread import CommentThread
 
 class MarkdownFormatter:
     """Formatter for converting comment threads to markdown."""
-    
-    def format(self, threads: List[CommentThread]) -> str:
+
+    def format(self, pr_number: int, threads: List[CommentThread]) -> str:
         """Format comment threads to markdown string.
         
         Args:
+            pr_number: The pull request number
             threads: List of comment threads
             
         Returns:
             Markdown formatted string
         """
         lines = []
+        lines.append(f"# PR-{pr_number} Review Comments")
         for thread in threads:
             lines.append(f"## {thread.file_path}")
             lines.append("")

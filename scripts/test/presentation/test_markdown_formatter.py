@@ -44,7 +44,7 @@ class TestMarkdownFormatter:
         formatter = MarkdownFormatter()
         
         # Act
-        result = formatter.format([thread])
+        result = formatter.format(123, [thread])
         
         # Assert
         assert "## test.py" in result
@@ -58,10 +58,10 @@ class TestMarkdownFormatter:
         formatter = MarkdownFormatter()
         
         # Act
-        result = formatter.format([])
+        result = formatter.format(123, [])
         
         # Assert
-        assert result == ""
+        assert result == "# PR-123 Review Comments"
 
     def test_format_diff_contextなし_コードブロックなし(self):
         # Arrange
@@ -85,7 +85,7 @@ class TestMarkdownFormatter:
         formatter = MarkdownFormatter()
         
         # Act
-        result = formatter.format([thread])
+        result = formatter.format(123, [thread])
         
         # Assert
         assert "```diff" not in result

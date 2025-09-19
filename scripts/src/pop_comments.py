@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """
-Entry point for the list missing summaries functionality.
+Entry point for the pop comments functionality.
 
-This module provides the list missing summaries functionality following
+This module provides the pop comments functionality following
 Robert C. Martin's design principles with proper class-to-file mapping.
 """
 
@@ -13,6 +13,6 @@ import os
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 
 if __name__ == "__main__":
-    from scripts.src.presentation.list_missing_summaries_controller import ListMissingSummariesController
-    controller = ListMissingSummariesController()
+    from scripts.src.presentation.pop_comments_controller import PopCommentsController
+    controller = PopCommentsController()
     controller.run()

@@ -10,7 +10,6 @@ GitHubリポジトリのプルリクエストからレビューコメントとDi
 主な機能：
 
 - 指定期間内のクローズ済みPRのレビューコメント収集
-- 収集データの管理ユーティリティ
 
 ## 📋 前提条件
 
@@ -58,24 +57,10 @@ python scripts/src/fetch.py --token "your_github_token_here"
 python scripts/src/auth.py --clear-token
 ```
 
-## 🛠️ クイックスタート
-
-### 基本的な収集
+### 欠落サマリーPRのコメント出力
 
 ```bash
-python scripts/src/fetch.py --repo "owner/repository" --from-date "2025-09-01" --to-date "2025-09-10"
-```
-
-### サマリーデータ欠如チェック
-
-```bash
-python scripts/src/list_missing_summaries.py --repo "owner/repository"
-```
-
-### PRコメントの出力
-
-```bash
-python scripts/src/get_comments.py --repo "owner/repository" --pr PR-123
+python scripts/src/pop_comments.py --repo "owner/repository"
 ```
 
 ## 📖 詳細な使用方法
@@ -85,8 +70,7 @@ python scripts/src/get_comments.py --repo "owner/repository" --pr PR-123
 | コマンド | 説明 |
 |----------|------|
 | `fetch.py` | PRレビューコメントの収集 |
-| `list_missing_summaries.py` | サマリーが作成されていないレビューコメントの検索 |
-| `get_comments.py` | 指定PRのレビューコメントをMarkdown形式で出力 |
+| `pop_comments.py` | 欠落サマリーの先頭PRのレビューコメントをMarkdown形式で出力 |
 | `set_summary.py` | PRのレビュー要約を設定 |
 | `auth.py` | GitHubトークンの管理 |
 
@@ -102,19 +86,11 @@ python scripts/src/get_comments.py --repo "owner/repository" --pr PR-123
 | `--token` | ❌ | GitHubトークン | 環境変数/キーリング |
 | `--verbose` | ❌ | 詳細出力 | `False` |
 
-### list_missing_summaries.py オプション
+### pop_comments.py オプション
 
 | オプション | 必須 | 説明 | デフォルト |
 |-----------|------|------|-----------|
 | `--repo` | ✅ | リポジトリ名（`owner/repo`形式） | - |
-| `--output-dir` | ❌ | 出力ディレクトリ | `pullrequests` |
-
-### get_comments.py オプション
-
-| オプション | 必須 | 説明 | デフォルト |
-|-----------|------|------|-----------|
-| `--repo` | ✅ | リポジトリ名（`owner/repo`形式） | - |
-| `--pr` | ✅ | PR番号（`PR-<number>`形式） | - |
 | `--output-dir` | ❌ | 出力ディレクトリ | `pullrequests` |
 
 ### set_summary.py オプション

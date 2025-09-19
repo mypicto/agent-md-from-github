@@ -1,0 +1,58 @@
+"""
+Test for PopCommentsController.
+"""
+
+import unittest
+from unittest.mock import patch, MagicMock
+import sys
+from io import StringIO
+
+from scripts.src.presentation.pop_comments_controller import PopCommentsController
+
+
+class TestPopCommentsController(unittest.TestCase):
+    """Test cases for PopCommentsController."""
+    
+    def setUp(self):
+        """Set up test fixtures."""
+        self.controller = PopCommentsController()
+    
+    @patch('scripts.src.presentation.pop_comments_controller.ServiceFactory')
+    def test_run_正常系_欠落PRあり(self, mock_factory):
+        """正常系: 欠落PRがある場合のテスト"""
+        # Arrange
+        mock_service = MagicMock()
+        mock_service.get_next_missing_comments_markdown.return_value = "# PR Comments\n\nSome comments..."
+        mock_factory.create_pop_comments_service.return_value = mock_service
+        
+        # Act
+        with patch('builtins.print') as mock_print:
+            self.controller.run(['--repo', 'owner/repo'])
+        
+        # Assert
+        mock_print.assert_called_once_with("# PR Comments\n\nSome comments...")
+    
+    @patch('scripts.src.presentation.pop_comments_controller.ServiceFactory')
+    def test_run_正常系_欠落PRなし(self, mock_factory):
+        """正常系: 欠落PRがない場合のテスト"""
+        # Arrange
+        mock_service = MagicMock()
+        mock_service.get_next_missing_comments_markdown.return_value = "No missing summaries found."
+        mock_factory.create_pop_comments_service.return_value = mock_service
+        
+        # Act
+        with patch('builtins.print') as mock_print:
+            self.controller.run(['--repo', 'owner/repo'])
+        
+        # Assert
+        mock_print.assert_called_once_with("No missing summaries found.")
+    
+    def test_run_異常系_無効なリポジトリ形式(self):
+        """異常系: 無効なリポジトリ形式の場合のテスト"""
+        # Act & Assert
+        with patch('sys.stderr', new_callable=StringIO) as mock_stderr:
+            with self.assertRaises(SystemExit):
+                self.controller.run(['--repo', 'invalid-repo-format'])
+        
+        # Assert
+        self.assertIn("Error:", mock_stderr.getvalue())

@@ -11,6 +11,7 @@ from ..application.services.pr_review_collection_service import PRReviewCollecti
 from ..application.services.missing_summaries_service import MissingSummariesService
 from ..application.services.comments_service import CommentsService
 from ..application.services.review_summary_service import ReviewSummaryService
+from ..application.services.pop_comments_service import PopCommentsService
 from .repositories.github_repository import GitHubRepository
 from .repositories.pull_request_metadata_repository import PullRequestMetadataRepository
 from .repositories.summary_repository import SummaryRepository
@@ -124,3 +125,14 @@ class ServiceFactory:
         pr_metadata_repository = PullRequestMetadataRepository()
         
         return ReviewSummaryService(review_summary_repository, pr_metadata_repository)
+    
+    @staticmethod
+    def create_pop_comments_service() -> PopCommentsService:
+        """Create a pop comments service with all dependencies.
+        
+        Returns:
+            Configured pop comments service
+        """
+        missing_summaries_service = ServiceFactory.create_missing_summaries_service()
+        comments_service = ServiceFactory.create_comments_service()
+        return PopCommentsService(missing_summaries_service, comments_service)
