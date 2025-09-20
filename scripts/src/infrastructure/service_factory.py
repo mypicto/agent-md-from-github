@@ -12,6 +12,7 @@ from ..application.services.missing_summaries_service import MissingSummariesSer
 from ..application.services.comments_service import CommentsService
 from ..application.services.review_summary_service import ReviewSummaryService
 from ..application.services.pop_comments_service import PopCommentsService
+from ..application.services.list_summary_files_service import ListSummaryFilesService
 from .repositories.github_repository import GitHubRepository
 from .repositories.pull_request_metadata_repository import PullRequestMetadataRepository
 from .repositories.summary_repository import SummaryRepository
@@ -136,3 +137,13 @@ class ServiceFactory:
         missing_summaries_service = ServiceFactory.create_missing_summaries_service()
         comments_service = ServiceFactory.create_comments_service()
         return PopCommentsService(missing_summaries_service, comments_service)
+    
+    @staticmethod
+    def create_list_summary_files_service() -> ListSummaryFilesService:
+        """Create a list summary files service with all dependencies.
+        
+        Returns:
+            Configured list summary files service
+        """
+        summary_repository = SummaryRepository()
+        return ListSummaryFilesService(summary_repository)

@@ -57,12 +57,6 @@ python scripts/src/fetch.py --token "your_github_token_here"
 python scripts/src/auth.py --clear-token
 ```
 
-### 欠落サマリーPRのコメント出力
-
-```bash
-python scripts/src/pop_comments.py --repo "owner/repository"
-```
-
 ## 📖 詳細な使用方法
 
 ### 利用可能なコマンド
@@ -72,6 +66,7 @@ python scripts/src/pop_comments.py --repo "owner/repository"
 | `fetch.py` | PRレビューコメントの収集 |
 | `pop_comments.py` | 欠落サマリーの先頭PRのレビューコメントをMarkdown形式で出力 |
 | `set_summary.py` | PRのレビュー要約を設定 |
+| `list_summary_files.py` | 指定リポジトリのサマリーファイルを優先度でフィルタリングして一覧表示 |
 | `auth.py` | GitHubトークンの管理 |
 
 ### fetch.py オプション
@@ -101,6 +96,13 @@ python scripts/src/pop_comments.py --repo "owner/repository"
 | `--pr` | ✅ | PR番号 | - |
 | `--priority` | ✅ | 優先度（`high`, `middle`, `low`） | - |
 | `--file` | ✅ | 要約ファイルのパス（Markdown形式） | - |
+
+### list_summary_files.py オプション
+
+| オプション | 必須 | 説明 | デフォルト |
+|-----------|------|------|-----------|
+| `--repo` | ✅ | リポジトリ名（`owner/repo`形式） | - |
+| `--priority` | ❌ | 優先度でフィルタリング（`high`, `middle`, `low`、複数指定可） | 全て |
 
 ### auth.py オプション
 
