@@ -1,48 +1,53 @@
 ---
 mode: agent
 ---
-あなたはテックリード兼プロンプトエンジニアです。目的は、レビュー要約（*-summary.md）から重要観点を抽出し、`templates/agent-template.md`に準拠したコーディング方針の指示を生成して、ワークスペースルートに`copilot-instructions.md`として保存することです。
-
-# Laws
-- **Priority**: 開発チームにとって重要な観点を推論して採用する。少数意見でも重大性が高いと判断したら採用する。
-- **Ignore**: 不具合の指摘（バグの単純指摘）は抽出対象から除外する。
-- **Format**: `copilot-instructions.md`には前置きやメタ情報を一切含めず、肯定的かつ明確な命令文のみを出力する。
-
-# Assumptions
-- `copilot-instructions.md`が既に存在する場合はアップグレードを行う。既存の規約に加えて、サマリーや`memorys/`から抽出した新しい観点を反映させ、冗長・重複は統合して最新化する。
-
-# Output Requirements
-- **最終成果物**: `copilot-instructions.md`（ワークスペースルート）
-  - テンプレートに準拠した見出し構成
-  - サマリーから特定スタック（例: TypeScript, Python, Unity C#）が明示されている場合、その規約を優先的に記述する
-  - すべて**肯定的な命令**で記述する（「〜してください」「〜を必ず行ってください」）
-- **補助成果物**: `memorys/`配下に以下を作成
-  - `extraction-notes.md`: 抽出した観点の短い要約、採否理由（重大性・再現性・影響範囲）
-  - `sources.md`: どの`*-summary.md`からどの観点を得たかの対応表
-  - `assumptions.md`: 環境やテンプレートの不明点に対する前提
+あなたはテックリード兼プロンプトエンジニアである。
+目的：レビュー要約（`list_summary_files.py` で確認）から重要な観点を抽出し、`templates/agent-template.md`に準拠したコーディング方針をデータベース化してから、ワークスペース直下に最終成果物としての `AGENT.md` を更新する。
 
 # Execution Order
 
-1. **テンプレート読込**: `templates/agent-template.md`を読み込み、必要セクションを内部マップにする。
-2. **ファイル探索**: 以下のコマンドでレビューが要約されたファイルを全て検索する。
+1. **必須パラメータの確認**
+   * 対象リポジトリ（形式：`owner/repository`）。不足していればユーザーに確認して取得する。
 
-  ```bash
-  find pullrequests -type f -name "PR-*-summary.md"
-  ```
+2. **テンプレートの読込**
+   * `templates/agent-template.md`を開き、構造（見出し構成）とスタイル（文体・表現）を把握する。
 
-3. **観点抽出**: レビューコメントからコード品質向上の観点を抽出する。  
-   - 抽出対象: 命名、一貫性、責務分離、テスト容易性、例外方針、セキュリティ、性能、並行性、API設計、ロギング、ドキュメントなど  
-   - 除外: 不具合の単純指摘、機能要求
-   - `memorys/`に要点・採否理由・出典対応を記録する
-4. **統合/正規化**: 重複や言い換えを統合し、矛盾は「重大性＞再現性＞影響範囲」で解決する。
-5. **テンプレート適用**: 抽出観点をテンプレートにマッピングし、不足セクションを合理的に追加する。
-6. **文体整形**: すべて肯定的な命令表現に変換し整える。
-7. **アップグレード適用**: 既存`copilot-instructions.md`がある場合は内容を読み込み、重複を整理しつつ新しい観点を統合する。
-8. **自己検証**:  
-   - 必須セクションが埋まっているか  
-   - 否定命令が含まれていないか  
-   - 出典が`memorys/sources.md`に記録されているか  
-   - 既存規約との統合が反映されているか
-9. **保存**: `copilot-instructions.md`を更新または新規作成する。
+3. **要約ファイル一覧の取得**
+   * 次のコマンドを実行し、優先度 High のPR要約ファイルパスを収集する（`./temp`が無ければ作成しておく）。
 
-深呼吸して、テンプレート読込→探索→抽出→統合→整形→アップグレード→自己検証→保存の順に実行してください。
+   ```bash
+   python scripts/src/list_summary_files.py --repo "<owner/repository>" --priority high > ./temp/list_summary_files_output.md
+   ```
+
+4. **レビュー精読とルール抽出**
+   * `temp/list_summary_files_output.md`に記載されたすべてのファイルを読み込む。
+   * レビューコメントを精査し、コーディング規約・設計・品質に関わる重要観点を抽出する。
+   * `memorys/coding-instructions-knowledge-base.md`を更新する（追記・統合・不要箇所の削除を含む）。
+
+5. **整理と矛盾解消**
+   * 重複・言い換えを統合する。
+   * 矛盾は「**重大性 > 再現性 > 影響範囲**」の優先で解決する。
+
+6. **テンプレート統合と最終成果物の生成**
+   * 抽出した観点をテンプレート各セクションにマッピングし、不足セクションは合理的に追加する。
+   * 既存の`./AGENT.md`があれば読み込み、重複を整理しつつ新しい観点を統合する。
+   * 文章はすべて**肯定的な命令形**に統一し、`/AGENT.md`としてワークスペース直下に保存する。
+
+# Laws
+
+* 開発チームにとって有用と推定できる観点は採用する。少数意見でも重大性が高い場合は採用する。
+* `AGENT.md`には前置きやメタ情報を一切**含めない**。
+
+## Helps
+
+### list_summary_files.py
+
+```bash
+usage: list_summary_files [-h] --repo REPO [--priority {high,middle,low}]
+List summary files by priority
+
+options:
+  -h, --help                   show this help message and exit
+  --repo REPO                  Repository in 'owner/repo' format
+  --priority {high,middle,low} Priority level to filter by (can be specified multiple times)
+```
