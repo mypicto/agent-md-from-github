@@ -16,12 +16,12 @@ mode: agent
    次に要約対象となるPRの情報をMarkdownで取得する。
 
    ```bash
-   python scripts/src/pop_comments.py --repo "<owner/repository>" > ./temp/pop_comments_output.md
+   python scripts/src/pop_comments.py --repo "<owner/repository>" > ./workspace/temp/pop_comments_output.md
    ```
 
 3. **要約作成（レビューコメントの精査）**
-   `./temp/pop_comments_output.md` を読み、PRのレビューコメントを精査する。
-   背景意図を読み解き、コード品質向上に関わる**重要な観点**を **What / How / Why** 形式で要約し、`./temp/summary_PR-<PR_NUMBER>.md` に保存する。
+   `./workspace/temp/pop_comments_output.md` を読み、PRのレビューコメントを精査する。
+   背景意図を読み解き、コード品質向上に関わる**重要な観点**を **What / How / Why** 形式で要約し、`./workspace/temp/summary_PR-<PR_NUMBER>.md` に保存する。
 
    * それぞれの観点に**カテゴリ**を付ける（例: 設計 / 可読性 / テスト / パフォーマンス / セキュリティ）。
    * 表面的な指摘の羅列ではなく、レビュアーの**根本意図（設計原則・品質リスク）**を推測して反映する。
@@ -51,7 +51,7 @@ mode: agent
    生成したサマリーファイルを登録する。`--pr` は **数値のPR番号**、`--priority` は **小文字かつ `high|middle|low`** を指定する。
 
    ```bash
-   python scripts/src/set_summary.py --repo "<owner/repository>" --pr <PR_NUMBER> --priority <high|middle|low> --file "./temp/summary_PR-<PR_NUMBER>.md"
+   python scripts/src/set_summary.py --repo "<owner/repository>" --pr <PR_NUMBER> --priority <high|middle|low> --file "./workspace/temp/summary_PR-<PR_NUMBER>.md"
    ```
 
 # Laws

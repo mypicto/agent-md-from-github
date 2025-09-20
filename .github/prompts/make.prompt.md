@@ -13,16 +13,16 @@ mode: agent
    * `templates/agent-template.md`を開き、構造（見出し構成）とスタイル（文体・表現）を把握する。
 
 3. **要約ファイル一覧の取得**
-   * 次のコマンドを実行し、優先度 High のPR要約ファイルパスを収集する（`./temp`が無ければ作成しておく）。
+   * 次のコマンドを実行し、優先度 High のPR要約ファイルパスを収集する（`./workspace/temp`が無ければ作成しておく）。
 
    ```bash
-   python scripts/src/list_summary_files.py --repo "<owner/repository>" --priority high > ./temp/list_summary_files_output.md
+   python scripts/src/list_summary_files.py --repo "<owner/repository>" --priority high > ./workspace/temp/list_summary_files_output.md
    ```
 
 4. **レビュー精読とルール抽出**
-   * `temp/list_summary_files_output.md`に記載されたすべてのファイルを読み込む。
+   * `workspace/temp/list_summary_files_output.md`に記載されたすべてのファイルを読み込む。
    * レビューコメントを精査し、コーディング規約・設計・品質に関わる重要観点を抽出する。
-   * `memorys/coding-instructions-knowledge-base.md`を更新する（追記・統合・不要箇所の削除を含む）。
+   * `workspace/memorys/coding-instructions-knowledge-base.md`を更新する（追記・統合・不要箇所の削除を含む）。
 
 5. **整理と矛盾解消**
    * 重複・言い換えを統合する。
