@@ -73,12 +73,6 @@ class FetchController:
         )
 
         parser.add_argument(
-            "--output-dir",
-            default="pullrequests",
-            help="Output directory (default: pullrequests)"
-        )
-
-        parser.add_argument(
             "--timezone",
             default="Asia/Tokyo",
             help="Timezone for date filtering (default: Asia/Tokyo)"
@@ -114,7 +108,7 @@ class FetchController:
             github_token = self._get_github_token(parsed_args.token)
             repository_id = RepositoryIdentifier.from_string(parsed_args.repo)
             date_range = self._create_date_range(parsed_args, parsed_args.timezone)
-            output_directory = Path(parsed_args.output_dir)
+            output_directory = Path("workspace/pullrequests")
 
             # Create application service
             collection_service = ServiceFactory.create_pr_collection_service(

@@ -108,7 +108,6 @@ class TestFetchController:
             args.from_date = datetime(2023, 1, 1)
             args.to_date = datetime(2023, 1, 2)
             args.timezone = 'Asia/Tokyo'
-            args.output_dir = 'pullrequests'
 
             controller._handle_collector_command(args)
 

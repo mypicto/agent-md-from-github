@@ -28,11 +28,6 @@ class PopCommentsController:
             required=True,
             help="Repository name in format 'owner/repo'"
         )
-        self._parser.add_argument(
-            "--output-dir",
-            default="pullrequests",
-            help="Output directory (default: pullrequests)"
-        )
     
     def run(self, args: list[str] = None) -> None:
         """Run the controller.
@@ -47,7 +42,7 @@ class PopCommentsController:
         """Handle the command."""
         try:
             repository_id = RepositoryIdentifier.from_string(parsed_args.repo)
-            output_directory = Path(parsed_args.output_dir)
+            output_directory = Path("workspace/pullrequests")
             
             # Create service
             service = ServiceFactory.create_pop_comments_service()

@@ -76,7 +76,6 @@ python scripts/src/auth.py --clear-token
 | `--repo` | ✅ | リポジトリ名（`owner/repo`形式） | - |
 | `--from-date` | ✅ | 開始日（`YYYY-MM-DD`） | - |
 | `--to-date` | ✅ | 終了日（`YYYY-MM-DD`） | - |
-| `--output-dir` | ❌ | 出力ディレクトリ | `pullrequests` |
 | `--timezone` | ❌ | タイムゾーン | `Asia/Tokyo` |
 | `--token` | ❌ | GitHubトークン | 環境変数/キーリング |
 | `--verbose` | ❌ | 詳細出力 | `False` |
@@ -86,7 +85,6 @@ python scripts/src/auth.py --clear-token
 | オプション | 必須 | 説明 | デフォルト |
 |-----------|------|------|-----------|
 | `--repo` | ✅ | リポジトリ名（`owner/repo`形式） | - |
-| `--output-dir` | ❌ | 出力ディレクトリ | `pullrequests` |
 
 ### set_summary.py オプション
 
@@ -116,16 +114,17 @@ python scripts/src/auth.py --clear-token
 ### ディレクトリ構造
 
 ```text
-pullrequests/
-├── owner/
-│   └── repository/
-│       ├── 2025-09-01/
-│       │   ├── PR-123-metadata.json
-│       ├── 2025-09-02/
-│       │   ├── PR-456-metadata.json
-│       └── summaries/
-│           ├── PR-123-summary.md
-│           └── PR-456-summary.md
+workspace/
+└── pullrequests/
+    ├── owner/
+    └── repository/
+        ├── 2025-09-01/
+        │   ├── PR-123-metadata.json
+        ├── 2025-09-02/
+        │   ├── PR-456-metadata.json
+        └── summaries/
+            ├── PR-123-summary.md
+            └── PR-456-summary.md
 ```
 
 ### JSONデータ形式
