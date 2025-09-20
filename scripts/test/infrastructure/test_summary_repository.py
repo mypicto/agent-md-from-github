@@ -5,7 +5,6 @@ Unit tests for SummaryRepository.
 import pytest
 import tempfile
 from pathlib import Path
-from unittest.mock import patch
 
 from scripts.src.domain.repository_identifier import RepositoryIdentifier
 from scripts.src.domain.review_summary import ReviewSummary
@@ -51,16 +50,16 @@ class TestSummaryRepository:
 
     def test_exists_summary_要約ファイル存在_ファイルが存在する(self, repo, temp_dir, sample_metadata):
         """Test exists_summary returns True when file exists."""
-        # Create the summary file
+                # Create the summary file
         summary_path = temp_dir / "summaries" / "PR-123.yml"
         summary_path.parent.mkdir(parents=True, exist_ok=True)
         summary_path.touch()
 
-        assert repo.exists_summary(sample_metadata, temp_dir) is True
+        assert repo.exists_summary(sample_metadata) is True
 
     def test_exists_summary_要約ファイル不存在_ファイルが存在しない(self, repo, temp_dir, sample_metadata):
         """Test exists_summary returns False when file does not exist."""
-        assert repo.exists_summary(sample_metadata, temp_dir) is False
+        assert repo.exists_summary(sample_metadata) is False
 
     def test_save_ファイル作成_ファイルが作成される(self, repo, temp_dir, sample_summary):
         """Test save creates the summary file with correct content."""
@@ -126,3 +125,29 @@ class TestSummaryRepository:
         # Ensure the content preserves newlines and formatting
         assert '**Category:** 設計' in yaml_content
         assert '**What:** UseCaseでの入力バリデーション' in yaml_content
+
+    def test_list_summary_files_ファイル一覧_ファイルパスリストが返される(self, repo, temp_dir):
+        """Test list_summary_files returns list of summary file paths."""
+        # Create summaries directory and files
+        summaries_dir = temp_dir / "summaries"
+        summaries_dir.mkdir(parents=True, exist_ok=True)
+        
+        # Create some PR files
+        (summaries_dir / "PR-123.yml").touch()
+        (summaries_dir / "PR-456.yml").touch()
+        (summaries_dir / "other.txt").touch()  # Non-PR file, should be ignored by glob
+
+        file_paths = repo.list_summary_files()
+
+        # Should return paths for PR files only
+        expected_paths = [
+            str(summaries_dir / "PR-123.yml"),
+            str(summaries_dir / "PR-456.yml")
+        ]
+        assert set(file_paths) == set(expected_paths)
+
+    def test_list_summary_files_ディレクトリ不存在_空リストが返される(self, repo, temp_dir):
+        """Test list_summary_files returns empty list when summaries directory does not exist."""
+        file_paths = repo.list_summary_files()
+
+        assert file_paths == []

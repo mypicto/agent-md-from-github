@@ -3,8 +3,7 @@ Interface for managing PR summaries.
 """
 
 from abc import ABC, abstractmethod
-from pathlib import Path
-from typing import Optional
+from typing import Optional, List
 
 from ..pull_request_metadata import PullRequestMetadata
 from ..review_summary import ReviewSummary
@@ -15,12 +14,11 @@ class SummaryRepositoryInterface(ABC):
     """Interface for managing PR summaries."""
 
     @abstractmethod
-    def exists_summary(self, metadata: PullRequestMetadata, output_directory: Path) -> bool:
+    def exists_summary(self, metadata: PullRequestMetadata) -> bool:
         """Check if summary file exists for the given PR metadata.
 
         Args:
             metadata: The PR metadata
-            output_directory: Base output directory
 
         Returns:
             True if summary file exists
@@ -46,5 +44,14 @@ class SummaryRepositoryInterface(ABC):
             
         Returns:
             ReviewSummary if found, None otherwise
+        """
+        pass
+
+    @abstractmethod
+    def list_summary_files(self) -> List[str]:
+        """List all summary file paths.
+
+        Returns:
+            List of summary file paths
         """
         pass

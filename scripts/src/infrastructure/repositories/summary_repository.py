@@ -3,7 +3,7 @@ Repository for managing PR summaries.
 """
 
 from pathlib import Path
-from typing import Optional
+from typing import Optional, List
 from ruamel.yaml import YAML
 
 from ...domain.interfaces.summary_repository_interface import SummaryRepositoryInterface
@@ -15,21 +15,21 @@ from ...domain.repository_identifier import RepositoryIdentifier
 class SummaryRepository(SummaryRepositoryInterface):
     """Repository for managing PR summaries."""
 
-    def __init__(self, base_directory: str = "pullrequests"):
+    def __init__(self, base_directory: str = "workspace"):
         self._base_directory = Path(base_directory)
         self._yaml = YAML()
         self._yaml.default_style = '|'
         self._yaml.allow_unicode = True
         self._yaml.default_flow_style = False
 
-    def _get_summary_path(self, repository_id: RepositoryIdentifier, pr_number: int, base_directory: Path) -> Path:
+    def _get_summary_path(self, pr_number: int, base_directory: Path) -> Path:
         """Generate the summary file path."""
         summaries_dir = base_directory / "summaries"
         return summaries_dir / f"PR-{pr_number}.yml"
 
-    def exists_summary(self, metadata: PullRequestMetadata, output_directory: Path) -> bool:
+    def exists_summary(self, metadata: PullRequestMetadata) -> bool:
         """Check if summary file exists for the given PR metadata."""
-        summary_path = self._get_summary_path(metadata.repository_id, metadata.number, output_directory)
+        summary_path = self._get_summary_path(metadata.number, self._base_directory)
         return summary_path.exists()
 
     def save(self, summary: ReviewSummary) -> None:
@@ -54,7 +54,7 @@ class SummaryRepository(SummaryRepositoryInterface):
 
     def get(self, repository_id: RepositoryIdentifier, pr_number: int) -> Optional[ReviewSummary]:
         """Get a review summary by repository and PR number."""
-        summary_path = self._get_summary_path(repository_id, pr_number, self._base_directory)
+        summary_path = self._get_summary_path(pr_number, self._base_directory)
         if not summary_path.exists():
             return None
 
@@ -67,3 +67,10 @@ class SummaryRepository(SummaryRepositoryInterface):
             priority=data["priority"],
             summary=data["summary"]
         )
+
+    def list_summary_files(self) -> List[str]:
+        """List all summary file paths."""
+        summaries_dir = self._base_directory / "summaries"
+        if not summaries_dir.exists():
+            return []
+        return [str(file_path) for file_path in summaries_dir.glob("PR-*.yml")]

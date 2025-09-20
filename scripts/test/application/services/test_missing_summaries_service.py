@@ -107,7 +107,7 @@ class TestMissingSummariesService(unittest.TestCase):
         """Test listing missing summaries when some are missing."""
         self.pr_metadata_repo.find_all_by_repository.return_value = [self.metadata1, self.metadata2]
         
-        def exists_summary_side_effect(metadata, output_dir):
+        def exists_summary_side_effect(metadata):
             return metadata.number == 123  # Only PR 123 has summary
         
         self.summary_repo.exists_summary.side_effect = exists_summary_side_effect

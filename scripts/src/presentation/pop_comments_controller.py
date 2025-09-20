@@ -38,7 +38,7 @@ class PopCommentsController:
         try:
             workspace_config = WorkspaceConfig()
             repository_id = workspace_config.get_repository_identifier()
-            output_directory = Path("workspace/pullrequests")
+            output_directory = Path("workspace")
             
             # Create service
             service = ServiceFactory.create_pop_comments_service()

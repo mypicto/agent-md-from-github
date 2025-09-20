@@ -3,8 +3,7 @@ Tests for ListSummaryFilesService.
 """
 
 import pytest
-from unittest.mock import Mock, patch
-from pathlib import Path
+from unittest.mock import Mock
 
 from scripts.src.application.services.list_summary_files_service import ListSummaryFilesService
 from scripts.src.domain.repository_identifier import RepositoryIdentifier
@@ -54,19 +53,19 @@ class TestListSummaryFilesService:
             )
         ]
 
-    @patch("pathlib.Path.exists")
-    @patch("pathlib.Path.glob")
-    def test_list_summary_files_優先度フィルタあり_一致するファイルのみを返す(self, mock_glob, mock_exists, service, repo_id, sample_summaries):
-        """Test listing summary files with priority filter."""
-        # Setup mocks
-        mock_exists.return_value = True
-        mock_glob.return_value = [
-            Path("pullrequests/test-owner/test-repo/summaries/PR-1.yml"),
-            Path("pullrequests/test-owner/test-repo/summaries/PR-2.yml"),
-            Path("pullrequests/test-owner/test-repo/summaries/PR-3.yml")
+    @pytest.fixture
+    def sample_file_paths(self):
+        """Create sample file paths."""
+        return [
+            "workspace/summaries/PR-1.yml",
+            "workspace/summaries/PR-2.yml",
+            "workspace/summaries/PR-3.yml"
         ]
 
+    def test_list_summary_files_優先度フィルタあり_一致するファイルのみを返す(self, service, repo_id, sample_summaries, sample_file_paths):
+        """Test listing summary files with priority filter."""
         # Configure repository mock
+        service._summary_repository.list_summary_files.return_value = sample_file_paths
         service._summary_repository.get.side_effect = sample_summaries
 
         # Test filtering by high priority
@@ -76,19 +75,10 @@ class TestListSummaryFilesService:
         assert "PR-1.yml" in result[0]
         service._summary_repository.get.assert_any_call(repo_id, 1)
 
-    @patch("pathlib.Path.exists")
-    @patch("pathlib.Path.glob")
-    def test_list_summary_files_優先度フィルタなし_全てのファイルを返す(self, mock_glob, mock_exists, service, repo_id, sample_summaries):
+    def test_list_summary_files_優先度フィルタなし_全てのファイルを返す(self, service, repo_id, sample_summaries, sample_file_paths):
         """Test listing summary files without priority filter."""
-        # Setup mocks
-        mock_exists.return_value = True
-        mock_glob.return_value = [
-            Path("pullrequests/test-owner/test-repo/summaries/PR-1.yml"),
-            Path("pullrequests/test-owner/test-repo/summaries/PR-2.yml"),
-            Path("pullrequests/test-owner/test-repo/summaries/PR-3.yml")
-        ]
-
         # Configure repository mock
+        service._summary_repository.list_summary_files.return_value = sample_file_paths
         service._summary_repository.get.side_effect = sample_summaries
 
         # Test without priority filter (should return all)
@@ -97,27 +87,22 @@ class TestListSummaryFilesService:
         assert len(result) == 3
         assert all("PR-" in path for path in result)
 
-    @patch("pathlib.Path.exists")
-    def test_list_summary_files_ディレクトリなし_空のリストを返す(self, mock_exists, service, repo_id):
+    def test_list_summary_files_ディレクトリなし_空のリストを返す(self, service, repo_id):
         """Test listing summary files when directory doesn't exist."""
-        mock_exists.return_value = False
+        # Configure repository mock to return empty list
+        service._summary_repository.list_summary_files.return_value = []
 
         result = service.list_summary_files(repo_id, [])
 
         assert result == []
 
-    @patch("pathlib.Path.exists")
-    @patch("pathlib.Path.glob")
-    def test_list_summary_files_無効なファイル名_無視して処理する(self, mock_glob, mock_exists, service, repo_id):
+    def test_list_summary_files_無効なファイル名_無視して処理する(self, service, repo_id):
         """Test handling of invalid filename formats."""
-        # Setup mocks
-        mock_exists.return_value = True
-        mock_glob.return_value = [
-            Path("pullrequests/test-owner/test-repo/summaries/invalid.yml"),
-            Path("pullrequests/test-owner/test-repo/summaries/PR-1.yml")
-        ]
-
         # Configure repository mock
+        service._summary_repository.list_summary_files.return_value = [
+            "workspace/summaries/invalid.yml",
+            "workspace/summaries/PR-1.yml"
+        ]
         service._summary_repository.get.return_value = None
 
         result = service.list_summary_files(repo_id, [])
@@ -125,17 +110,12 @@ class TestListSummaryFilesService:
         # Should skip invalid files and files that can't be loaded
         assert len(result) == 0
 
-    @patch("pathlib.Path.exists")
-    @patch("pathlib.Path.glob")
-    def test_list_summary_files_リポジトリがNoneを返す_ファイルをスキップする(self, mock_glob, mock_exists, service, repo_id):
+    def test_list_summary_files_リポジトリがNoneを返す_ファイルをスキップする(self, service, repo_id):
         """Test when repository returns None for a summary."""
-        # Setup mocks
-        mock_exists.return_value = True
-        mock_glob.return_value = [
-            Path("pullrequests/test-owner/test-repo/summaries/PR-1.yml")
+        # Configure repository mock
+        service._summary_repository.list_summary_files.return_value = [
+            "workspace/summaries/PR-1.yml"
         ]
-
-        # Configure repository mock to return None
         service._summary_repository.get.return_value = None
 
         result = service.list_summary_files(repo_id, [])

@@ -4,10 +4,8 @@ List summary files controller.
 
 import argparse
 import sys
-from typing import List
 
-from ..application.services.list_summary_files_service import ListSummaryFilesService
-from ..domain.repository_identifier import RepositoryIdentifier
+from ..domain.workspace_config import WorkspaceConfig
 from ..infrastructure.service_factory import ServiceFactory
 
 
@@ -25,11 +23,6 @@ class ListSummaryFilesController:
             prog="list_summary_files"
         )
         self._parser.add_argument(
-            "--repo",
-            required=True,
-            help="Repository in 'owner/repo' format"
-        )
-        self._parser.add_argument(
             "--priority",
             action="append",
             choices=["high", "middle", "low"],
@@ -42,7 +35,8 @@ class ListSummaryFilesController:
 
         try:
             # Parse repository identifier
-            repository_id = RepositoryIdentifier.from_string(args.repo)
+            workspace_config = WorkspaceConfig()
+            repository_id = workspace_config.get_repository_identifier()
 
             # Get priorities (empty list means all)
             priorities = args.priority if args.priority else []
@@ -57,7 +51,7 @@ class ListSummaryFilesController:
             for path in file_paths:
                 print(path)
 
-        except ValueError as e:
+        except (ValueError, FileNotFoundError) as e:
             print(f"Error: {e}", file=sys.stderr)
             sys.exit(1)
         except Exception as e:

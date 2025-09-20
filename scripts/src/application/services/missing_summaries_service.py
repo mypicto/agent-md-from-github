@@ -41,7 +41,7 @@ class MissingSummariesService:
         metadata_list = self._filter_metadata(metadata_list)
         metadata_list = self._sort_metadata(metadata_list)
         
-        missing_numbers = self._find_missing_numbers(metadata_list, output_directory)
+        missing_numbers = self._find_missing_numbers(metadata_list)
         
         return missing_numbers
     
@@ -67,19 +67,18 @@ class MissingSummariesService:
         """
         return sorted(metadata_list, key=lambda m: len(m.review_comments), reverse=True)
     
-    def _find_missing_numbers(self, metadata_list: List[PullRequestMetadata], output_directory: Path) -> List[int]:
+    def _find_missing_numbers(self, metadata_list: List[PullRequestMetadata]) -> List[int]:
         """Find PR numbers that are missing corresponding summary files.
         
         Args:
             metadata_list: Filtered and sorted list of PR metadata
-            output_directory: Output directory
             
         Returns:
             List of PR numbers missing summaries
         """
         missing_numbers = []
         for metadata in metadata_list:
-            if not self._summary_repository.exists_summary(metadata, output_directory):
+            if not self._summary_repository.exists_summary(metadata):
                 missing_numbers.append(metadata.number)
         
         return missing_numbers

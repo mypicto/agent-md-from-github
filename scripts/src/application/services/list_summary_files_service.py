@@ -2,13 +2,10 @@
 Service for listing summary files based on priority filter.
 """
 
-import os
 from pathlib import Path
 from typing import List
 
-from ...domain.priority_filter import PriorityFilter
 from ...domain.repository_identifier import RepositoryIdentifier
-from ...domain.review_summary import ReviewSummary
 from ...infrastructure.repositories.summary_repository import SummaryRepository
 
 
@@ -37,17 +34,14 @@ class ListSummaryFilesService:
         Returns:
             List of summary file paths matching the criteria
         """
-        # Get the summaries directory path
-        repo_dir = Path("pullrequests") / repository_id.owner / repository_id.name
-        summaries_dir = repo_dir / "summaries"
-
-        if not summaries_dir.exists():
-            return []
+        # Get all summary file paths from repository
+        all_files = self._summary_repository.list_summary_files()
 
         matching_files = []
 
-        # Iterate through all yml files in the summaries directory
-        for file_path in summaries_dir.glob("PR-*.yml"):
+        # Iterate through all summary files
+        for file_path_str in all_files:
+            file_path = Path(file_path_str)
             # Extract PR number from filename
             filename = file_path.name
             if not filename.startswith("PR-") or not filename.endswith(".yml"):

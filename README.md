@@ -89,17 +89,19 @@ python scripts/src/auth.py --clear-token
 
 | オプション | 必須 | 説明 | デフォルト |
 |-----------|------|------|-----------|
-| `--repo` | ✅ | リポジトリ名（`owner/repo`形式） | - |
 | `--pr` | ✅ | PR番号 | - |
 | `--priority` | ✅ | 優先度（`high`, `middle`, `low`） | - |
 | `--file` | ✅ | 要約ファイルのパス（Markdown形式） | - |
+
+- リポジトリ情報は `workspace/workspace.yml` から取得します。
 
 ### list_summary_files.py オプション
 
 | オプション | 必須 | 説明 | デフォルト |
 |-----------|------|------|-----------|
-| `--repo` | ✅ | リポジトリ名（`owner/repo`形式） | - |
 | `--priority` | ❌ | 優先度でフィルタリング（`high`, `middle`, `low`、複数指定可） | 全て |
+
+- リポジトリ情報は `workspace/workspace.yml` から取得します。
 
 ### auth.py オプション
 
@@ -115,14 +117,14 @@ python scripts/src/auth.py --clear-token
 ```text
 workspace/
 ├── workspace.yml  # リポジトリ設定ファイル
-└── pullrequests/
-    ├── 2025-09-01/
-    │   ├── PR-123.json
-    ├── 2025-09-02/
-    │   ├── PR-456.json
-    └── summaries/
-        ├── PR-123.yml
-        └── PR-456.yml
+├── pullrequests/
+│   ├── 2025-09-01/
+│   │   ├── PR-123-metadata.json
+│   └── 2025-09-02/
+│       └── PR-456-metadata.json
+└── summaries/
+    ├── PR-123.yml
+    └── PR-456.yml
 ```
 
 ## ⚠️ トラブルシューティング

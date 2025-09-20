@@ -49,7 +49,7 @@ class TestPullRequestMetadataRepository:
             repo.save(pr_metadata, output_dir)
 
             # Assert
-            expected_path = output_dir / "2023-10-01" / "PR-123.json"
+            expected_path = output_dir / "pullrequests" / "2023-10-01" / "PR-123.json"
             assert expected_path.exists()
 
             with open(expected_path, "r", encoding="utf-8") as f:
@@ -81,7 +81,7 @@ class TestPullRequestMetadataRepository:
         with tempfile.TemporaryDirectory() as temp_dir:
             output_dir = Path(temp_dir)
             # Create the file
-            file_path = output_dir / "2023-10-01" / "PR-123.json"
+            file_path = output_dir / "pullrequests" / "2023-10-01" / "PR-123.json"
             file_path.parent.mkdir(parents=True, exist_ok=True)
             file_path.touch()
 
@@ -215,7 +215,7 @@ class TestPullRequestMetadataRepository:
 
         with tempfile.TemporaryDirectory() as temp_dir:
             output_dir = Path(temp_dir)
-            repo_dir = output_dir / "test-owner" / "test-repo" / "2023-10-01"
+            repo_dir = output_dir / "pullrequests" / "2023-10-01"
             repo_dir.mkdir(parents=True, exist_ok=True)
 
             # Create valid JSON file

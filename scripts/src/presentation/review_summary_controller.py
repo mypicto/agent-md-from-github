@@ -7,7 +7,7 @@ import sys
 from pathlib import Path
 
 from ..application.exceptions.pr_review_collection_error import PRReviewCollectionError
-from ..domain.repository_identifier import RepositoryIdentifier
+from ..domain.workspace_config import WorkspaceConfig
 from ..infrastructure.service_factory import ServiceFactory
 
 
@@ -23,12 +23,6 @@ class ReviewSummaryController:
         self._parser = argparse.ArgumentParser(
             description="Set review summary for a GitHub PR",
             prog="set_summary"
-        )
-        
-        self._parser.add_argument(
-            "--repo",
-            required=True,
-            help="Repository name in format 'owner/repo'"
         )
         
         self._parser.add_argument(
@@ -61,28 +55,29 @@ class ReviewSummaryController:
         
         try:
             # Parse repository identifier
-            repository_id = RepositoryIdentifier.from_string(parsed_args.repo)
+            workspace_config = WorkspaceConfig()
+            repository_id = workspace_config.get_repository_identifier()
             
             # Read summary from file
             summary_text = Path(parsed_args.file).read_text(encoding='utf-8')
             
             # Create service
             service = ServiceFactory.create_review_summary_service()
+
+            output_directory = Path("workspace")
             
             # Set summary
             service.set_summary(
                 repository_id=repository_id,
                 pr_number=parsed_args.pr,
                 priority=parsed_args.priority,
-                summary=summary_text
+                summary=summary_text,
+                output_directory=output_directory
             )
             
-            print(f"Successfully saved summary for PR #{parsed_args.pr} in {parsed_args.repo}")
+            print(f"Successfully saved summary for PR #{parsed_args.pr}")
             
-        except FileNotFoundError:
-            print(f"Error: File not found: {parsed_args.file}", file=sys.stderr)
-            sys.exit(1)
-        except PRReviewCollectionError as e:
+        except (FileNotFoundError, PRReviewCollectionError) as e:
             print(f"Error: {str(e)}", file=sys.stderr)
             sys.exit(1)
         except Exception as e:

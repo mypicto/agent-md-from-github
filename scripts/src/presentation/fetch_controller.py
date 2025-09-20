@@ -104,7 +104,7 @@ class FetchController:
             workspace_config = WorkspaceConfig()
             repository_id = workspace_config.get_repository_identifier()
             date_range = self._create_date_range(parsed_args, parsed_args.timezone)
-            output_directory = Path("workspace/pullrequests")
+            output_directory = Path("workspace")
 
             # Create application service
             collection_service = ServiceFactory.create_pr_collection_service(

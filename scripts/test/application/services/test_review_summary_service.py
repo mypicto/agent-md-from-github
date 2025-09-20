@@ -3,6 +3,7 @@ Tests for ReviewSummaryService.
 """
 
 import unittest
+from pathlib import Path
 from unittest.mock import Mock
 from scripts.src.application.services.review_summary_service import ReviewSummaryService
 from scripts.src.domain.repository_identifier import RepositoryIdentifier
@@ -39,7 +40,8 @@ class TestReviewSummaryService(unittest.TestCase):
         self.pr_metadata_repo.find_by_pr_number.return_value = pr_metadata
         
         # Act
-        self.service.set_summary(repo_id, 123, "high", "Test summary")
+        output_directory = Path("workspace")
+        self.service.set_summary(repo_id, 123, "high", "Test summary", output_directory)
         
         # Assert
         self.review_summary_repo.save.assert_called_once()
@@ -56,7 +58,8 @@ class TestReviewSummaryService(unittest.TestCase):
         
         # Act & Assert
         with self.assertRaises(PRReviewCollectionError):
-            self.service.set_summary(repo_id, 123, "high", "Test summary")
+            output_directory = Path("workspace")
+            self.service.set_summary(repo_id, 123, "high", "Test summary", output_directory)
     
     def test_set_summary_メタデータ取得エラーの場合_PRReviewCollectionErrorが発生する(self):
         # Arrange
@@ -65,4 +68,5 @@ class TestReviewSummaryService(unittest.TestCase):
         
         # Act & Assert
         with self.assertRaises(PRReviewCollectionError):
-            self.service.set_summary(repo_id, 123, "high", "Test summary")
+            output_directory = Path("workspace")
+            self.service.set_summary(repo_id, 123, "high", "Test summary", output_directory)

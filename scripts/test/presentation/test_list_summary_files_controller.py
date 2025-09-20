@@ -30,21 +30,23 @@ class TestListSummaryFilesController:
         # Setup mocks
         mock_factory.create_list_summary_files_service.return_value = mock_service
         mock_service.list_summary_files.return_value = [
-            "pullrequests/test-owner/test-repo/summaries/PR-1.yml",
-            "pullrequests/test-owner/test-repo/summaries/PR-2.yml"
+            "workspace/summaries/PR-1.yml",
+            "workspace/summaries/PR-2.yml"
         ]
 
-        # Mock argument parsing
+        # Mock argument parsing and workspace config
         with patch.object(controller._parser, 'parse_args', return_value=Namespace(
-            repo="test-owner/test-repo",
             priority=["high", "middle"]
-        )):
+        )), \
+             patch('scripts.src.presentation.list_summary_files_controller.WorkspaceConfig') as mock_workspace:
+            mock_repo_id = Mock()
+            mock_workspace.return_value.get_repository_identifier.return_value = mock_repo_id
+            
             controller.run()
 
         # Verify service was called correctly
         mock_factory.create_list_summary_files_service.assert_called_once()
-        repo_id = RepositoryIdentifier.from_string("test-owner/test-repo")
-        mock_service.list_summary_files.assert_called_once_with(repo_id, ["high", "middle"])
+        mock_service.list_summary_files.assert_called_once_with(mock_repo_id, ["high", "middle"])
 
         # Verify output
         captured = capsys.readouterr()
@@ -62,23 +64,26 @@ class TestListSummaryFilesController:
 
         # Mock argument parsing
         with patch.object(controller._parser, 'parse_args', return_value=Namespace(
-            repo="test-owner/test-repo",
             priority=None
-        )):
+        )), \
+             patch('scripts.src.presentation.list_summary_files_controller.WorkspaceConfig') as mock_workspace:
+            mock_repo_id = Mock()
+            mock_workspace.return_value.get_repository_identifier.return_value = mock_repo_id
+            
             controller.run()
 
         # Verify service was called with empty priority list
-        repo_id = RepositoryIdentifier.from_string("test-owner/test-repo")
-        mock_service.list_summary_files.assert_called_once_with(repo_id, [])
+        mock_service.list_summary_files.assert_called_once_with(mock_repo_id, [])
 
-    @patch("scripts.src.presentation.list_summary_files_controller.ServiceFactory")
-    def test_run_無効なリポジトリ形式_エラーを出力して終了する(self, mock_factory, controller, capsys):
-        """Test running with invalid repository format."""
+    def test_run_workspace設定なし_エラーを出力して終了する(self, controller, capsys):
+        """Test running when workspace config is not found."""
         # Mock argument parsing
         with patch.object(controller._parser, 'parse_args', return_value=Namespace(
-            repo="invalid-format",
             priority=["high"]
-        )):
+        )), \
+             patch('scripts.src.presentation.list_summary_files_controller.WorkspaceConfig') as mock_workspace:
+            mock_workspace.return_value.get_repository_identifier.side_effect = FileNotFoundError("Workspace configuration file not found")
+            
             with pytest.raises(SystemExit):
                 controller.run()
 
@@ -95,9 +100,12 @@ class TestListSummaryFilesController:
 
         # Mock argument parsing
         with patch.object(controller._parser, 'parse_args', return_value=Namespace(
-            repo="test-owner/test-repo",
             priority=["high"]
-        )):
+        )), \
+             patch('scripts.src.presentation.list_summary_files_controller.WorkspaceConfig') as mock_workspace:
+            mock_repo_id = Mock()
+            mock_workspace.return_value.get_repository_identifier.return_value = mock_repo_id
+            
             with pytest.raises(SystemExit):
                 controller.run()
 
@@ -109,12 +117,11 @@ class TestListSummaryFilesController:
         """Test that argument parser is properly configured."""
         parser = controller._parser
 
-        # Check repo argument
-        repo_action = next(action for action in parser._actions if action.dest == 'repo')
-        assert repo_action.required
-        assert repo_action.help == "Repository in 'owner/repo' format"
-
         # Check priority argument
+        priority_action = next(action for action in parser._actions if action.dest == 'priority')
+        assert type(priority_action).__name__ == '_AppendAction'
+        assert priority_action.choices == ['high', 'middle', 'low']
+        assert priority_action.help == "Priority level to filter by (can be specified multiple times)"
         priority_action = next(action for action in parser._actions if action.dest == 'priority')
         assert priority_action.choices == ["high", "middle", "low"]
         assert priority_action.help == "Priority level to filter by (can be specified multiple times)"

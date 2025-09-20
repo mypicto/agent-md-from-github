@@ -35,7 +35,8 @@ class ReviewSummaryService:
         repository_id: RepositoryIdentifier,
         pr_number: int,
         priority: str,
-        summary: str
+        summary: str,
+        output_directory: Path
     ) -> None:
         """Set a review summary for a PR.
         
@@ -44,13 +45,14 @@ class ReviewSummaryService:
             pr_number: PR number
             priority: Priority level ('high', 'middle', 'low')
             summary: Summary text
+            output_directory: Base output directory
             
         Raises:
             PRReviewCollectionError: If PR does not exist or other errors occur
         """
         # Validate PR exists by checking local metadata
         try:
-            pr_exists = self._pr_metadata_repository.find_by_pr_number(Path("workspace/pullrequests"), repository_id, pr_number)
+            pr_exists = self._pr_metadata_repository.find_by_pr_number(output_directory, repository_id, pr_number)
         except Exception as e:
             raise PRReviewCollectionError(f"Failed to retrieve PR metadata: {str(e)}")
         if not pr_exists:
