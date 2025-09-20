@@ -23,9 +23,9 @@ class PullRequestMetadataRepository(PullRequestMetadataRepositoryInterface):
             pr_metadata: The PR metadata to save
             output_directory: Base output directory
         """
-        # Create directory structure: output_directory / org / repo / date / PR-number-metadata.json
+        # Create directory structure: output_directory / date / PR-number-metadata.json
         date_str = pr_metadata.closed_at.strftime("%Y-%m-%d")
-        repo_path = output_directory / pr_metadata.repository_id.owner / pr_metadata.repository_id.name / date_str
+        repo_path = output_directory / date_str
         repo_path.mkdir(parents=True, exist_ok=True)
 
         file_path = repo_path / f"PR-{pr_metadata.number}-metadata.json"
@@ -60,7 +60,7 @@ class PullRequestMetadataRepository(PullRequestMetadataRepositoryInterface):
             True if file exists
         """
         date_str = basic_info.closed_at.strftime("%Y-%m-%d")
-        file_path = output_directory / basic_info.repository_id.owner / basic_info.repository_id.name / date_str / f"PR-{basic_info.number}-metadata.json"
+        file_path = output_directory / date_str / f"PR-{basic_info.number}-metadata.json"
         return file_path.exists()
 
     def find_all_by_repository(self, output_directory: Path, repository_id: RepositoryIdentifier) -> List[PullRequestMetadata]:
@@ -73,12 +73,11 @@ class PullRequestMetadataRepository(PullRequestMetadataRepositoryInterface):
         Returns:
             List of PullRequestMetadata
         """
-        repo_path = output_directory / repository_id.owner / repository_id.name
-        if not repo_path.exists():
+        if not output_directory.exists():
             return []
 
         metadata_list = []
-        for json_file in repo_path.rglob("PR-*-metadata.json"):
+        for json_file in output_directory.rglob("PR-*-metadata.json"):
             try:
                 with open(json_file, "r", encoding="utf-8") as f:
                     data = json.load(f)
@@ -110,7 +109,10 @@ class PullRequestMetadataRepository(PullRequestMetadataRepositoryInterface):
                         name=data["repository_id"]["name"]
                     )
                 )
-                metadata_list.append(metadata)
+
+                # Filter by repository_id
+                if metadata.repository_id == repository_id:
+                    metadata_list.append(metadata)
             except (json.JSONDecodeError, KeyError, ValueError):
                 # Skip invalid files
                 continue

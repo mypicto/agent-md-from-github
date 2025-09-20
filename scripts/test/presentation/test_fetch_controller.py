@@ -28,22 +28,25 @@ class TestFetchController:
         """Test run method executes successfully."""
         # Mock dependencies
         with patch('scripts.src.presentation.fetch_controller.ServiceFactory') as mock_factory:
-            mock_logger = MagicMock()
-            mock_service = MagicMock()
-            mock_factory.setup_logging.return_value = mock_logger
-            mock_factory.create_pr_collection_service.return_value = mock_service
+            with patch('scripts.src.presentation.fetch_controller.WorkspaceConfig') as mock_workspace:
+                mock_logger = MagicMock()
+                mock_service = MagicMock()
+                mock_repo_id = MagicMock()
+                mock_workspace.return_value.get_repository_identifier.return_value = mock_repo_id
+                mock_factory.setup_logging.return_value = mock_logger
+                mock_factory.create_pr_collection_service.return_value = mock_service
 
-            controller = FetchController()
-            args = ['--repo', 'owner/repo', '--from-date', '2023-01-01', '--to-date', '2023-01-02', '--token', 'test_token']
+                controller = FetchController()
+                args = ['--from-date', '2023-01-01', '--to-date', '2023-01-02', '--token', 'test_token']
 
-            controller.run(args)
+                controller.run(args)
 
-            mock_service.collect_review_comments.assert_called_once()
+                mock_service.collect_review_comments.assert_called_once()
 
     def test_run_エラー発生_適切なエラーメッセージが表示される(self):
         """Test run method handles errors appropriately."""
         controller = FetchController()
-        args = ['--repo', 'owner/repo', '--from-date', '2023-01-01', '--to-date', '2023-01-02']
+        args = ['--from-date', '2023-01-01', '--to-date', '2023-01-02']
 
         with patch('builtins.print') as mock_print:
             with patch('scripts.src.presentation.fetch_controller.ServiceFactory') as mock_factory:

@@ -6,7 +6,7 @@ import argparse
 import sys
 from pathlib import Path
 
-from ..domain.repository_identifier import RepositoryIdentifier
+from ..domain.workspace_config import WorkspaceConfig
 from ..infrastructure.service_factory import ServiceFactory
 
 
@@ -23,11 +23,6 @@ class PopCommentsController:
             description="Get comments for the next missing summary PR",
             prog="pop_comments"
         )
-        self._parser.add_argument(
-            "--repo",
-            required=True,
-            help="Repository name in format 'owner/repo'"
-        )
     
     def run(self, args: list[str] = None) -> None:
         """Run the controller.
@@ -41,7 +36,8 @@ class PopCommentsController:
     def _handle_command(self, parsed_args) -> None:
         """Handle the command."""
         try:
-            repository_id = RepositoryIdentifier.from_string(parsed_args.repo)
+            workspace_config = WorkspaceConfig()
+            repository_id = workspace_config.get_repository_identifier()
             output_directory = Path("workspace/pullrequests")
             
             # Create service
@@ -55,7 +51,7 @@ class PopCommentsController:
             # Output
             print(markdown)
             
-        except ValueError as e:
+        except (ValueError, FileNotFoundError) as e:
             print(f"Error: {e}", file=sys.stderr)
             sys.exit(1)
         except Exception as e:

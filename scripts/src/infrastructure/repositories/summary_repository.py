@@ -24,8 +24,7 @@ class SummaryRepository(SummaryRepositoryInterface):
 
     def _get_summary_path(self, repository_id: RepositoryIdentifier, pr_number: int, base_directory: Path) -> Path:
         """Generate the summary file path."""
-        repo_dir = base_directory / repository_id.owner / repository_id.name
-        summaries_dir = repo_dir / "summaries"
+        summaries_dir = base_directory / "summaries"
         return summaries_dir / f"PR-{pr_number}.yml"
 
     def exists_summary(self, metadata: PullRequestMetadata, output_directory: Path) -> bool:
@@ -35,8 +34,7 @@ class SummaryRepository(SummaryRepositoryInterface):
 
     def save(self, summary: ReviewSummary) -> None:
         """Save a review summary to file."""
-        repo_dir = self._base_directory / summary.repository_id.owner / summary.repository_id.name
-        summaries_dir = repo_dir / "summaries"
+        summaries_dir = self._base_directory / "summaries"
         summaries_dir.mkdir(parents=True, exist_ok=True)
 
         file_path = summaries_dir / f"PR-{summary.pr_number}.yml"

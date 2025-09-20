@@ -11,6 +11,7 @@ from pathlib import Path
 from ..application.exceptions.pr_review_collection_error import PRReviewCollectionError
 from ..domain.date_range import DateRange
 from ..domain.repository_identifier import RepositoryIdentifier
+from ..domain.workspace_config import WorkspaceConfig
 from ..infrastructure.service_factory import ServiceFactory
 from ..infrastructure.services.timezone_converter import TimezoneConverter
 from ..infrastructure.services.token_manager import TokenManager
@@ -52,12 +53,6 @@ class FetchController:
 
     def _setup_collector_arguments(self, parser) -> None:
         """Setup arguments for collector command."""
-        parser.add_argument(
-            "--repo",
-            required=True,
-            help="Repository name in format 'owner/repo'"
-        )
-
         parser.add_argument(
             "--from-date",
             type=parse_date,
@@ -106,7 +101,8 @@ class FetchController:
 
             # Validate and extract arguments
             github_token = self._get_github_token(parsed_args.token)
-            repository_id = RepositoryIdentifier.from_string(parsed_args.repo)
+            workspace_config = WorkspaceConfig()
+            repository_id = workspace_config.get_repository_identifier()
             date_range = self._create_date_range(parsed_args, parsed_args.timezone)
             output_directory = Path("workspace/pullrequests")
 
@@ -124,7 +120,7 @@ class FetchController:
                 output_directory=output_directory
             )
 
-        except (ValueError, PRReviewCollectionError) as e:
+        except (ValueError, PRReviewCollectionError, FileNotFoundError) as e:
             print(f"Error: {e}")
             sys.exit(1)
         except KeyboardInterrupt:

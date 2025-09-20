@@ -73,18 +73,17 @@ python scripts/src/auth.py --clear-token
 
 | オプション | 必須 | 説明 | デフォルト |
 |-----------|------|------|-----------|
-| `--repo` | ✅ | リポジトリ名（`owner/repo`形式） | - |
 | `--from-date` | ✅ | 開始日（`YYYY-MM-DD`） | - |
 | `--to-date` | ✅ | 終了日（`YYYY-MM-DD`） | - |
 | `--timezone` | ❌ | タイムゾーン | `Asia/Tokyo` |
 | `--token` | ❌ | GitHubトークン | 環境変数/キーリング |
 | `--verbose` | ❌ | 詳細出力 | `False` |
 
+- リポジトリ情報は `workspace/workspace.yml` から取得します。
+
 ### pop_comments.py オプション
 
-| オプション | 必須 | 説明 | デフォルト |
-|-----------|------|------|-----------|
-| `--repo` | ✅ | リポジトリ名（`owner/repo`形式） | - |
+- リポジトリ情報は `workspace/workspace.yml` から取得します。
 
 ### set_summary.py オプション
 
@@ -115,40 +114,15 @@ python scripts/src/auth.py --clear-token
 
 ```text
 workspace/
+├── workspace.yml  # リポジトリ設定ファイル
 └── pullrequests/
-    ├── owner/
-    └── repository/
-        ├── 2025-09-01/
-        │   ├── PR-123-metadata.json
-        ├── 2025-09-02/
-        │   ├── PR-456-metadata.json
-        └── summaries/
-            ├── PR-123-summary.md
-            └── PR-456-summary.md
-```
-
-### JSONデータ形式
-
-各PRのコメントデータは以下の構造で保存されます：
-
-```json
-{
-  "pr_number": 123,
-  "closed_at_iso": "2025-09-01T12:34:56+09:00",
-  "merged": true,
-  "review_comments": [
-    {
-      "id": 4567890,
-      "path": "src/app.py",
-      "original_position": 42,
-      "commit_id": "abc123def456...",
-      "user": "reviewer1",
-      "created_at": "2025-08-31T10:00:00+09:00",
-      "body": "ここは例外処理を追加したいです",
-      "context_patch_excerpt": "@@ -40,6 +40,9 @@\n def process_data(data):\n+    if not data:\n+        raise ValueError('Data is required')\n     return data.upper()\n"
-    }
-  ]
-}
+    ├── 2025-09-01/
+    │   ├── PR-123-metadata.json
+    ├── 2025-09-02/
+    │   ├── PR-456-metadata.json
+    └── summaries/
+        ├── PR-123.yml
+        └── PR-456.yml
 ```
 
 ## ⚠️ トラブルシューティング

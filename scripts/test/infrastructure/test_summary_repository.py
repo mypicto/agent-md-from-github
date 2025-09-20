@@ -52,7 +52,7 @@ class TestSummaryRepository:
     def test_exists_summary_要約ファイル存在_ファイルが存在する(self, repo, temp_dir, sample_metadata):
         """Test exists_summary returns True when file exists."""
         # Create the summary file
-        summary_path = temp_dir / "test-owner" / "test-repo" / "summaries" / "PR-123.yml"
+        summary_path = temp_dir / "summaries" / "PR-123.yml"
         summary_path.parent.mkdir(parents=True, exist_ok=True)
         summary_path.touch()
 
@@ -66,7 +66,7 @@ class TestSummaryRepository:
         """Test save creates the summary file with correct content."""
         repo.save(sample_summary)
 
-        summary_path = temp_dir / "test-owner" / "test-repo" / "summaries" / "PR-123.yml"
+        summary_path = temp_dir / "summaries" / "PR-123.yml"
         assert summary_path.exists()
 
         # Check content
@@ -112,7 +112,7 @@ class TestSummaryRepository:
         
         repo.save(summary_with_special_chars)
         
-        summary_path = temp_dir / "test-owner" / "test-repo" / "summaries" / "PR-456.yml"
+        summary_path = temp_dir / "summaries" / "PR-456.yml"
         assert summary_path.exists()
         
         # Read the raw YAML content to check format
