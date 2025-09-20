@@ -13,9 +13,11 @@ from ..application.services.comments_service import CommentsService
 from ..application.services.review_summary_service import ReviewSummaryService
 from ..application.services.pop_comments_service import PopCommentsService
 from ..application.services.list_summary_files_service import ListSummaryFilesService
+from ..application.services.workspace_switch_service import WorkspaceSwitchService
 from .repositories.github_repository import GitHubRepository
 from .repositories.pull_request_metadata_repository import PullRequestMetadataRepository
 from .repositories.summary_repository import SummaryRepository
+from .repositories.filesystem_workspace_repository import FileSystemWorkspaceRepository
 from .services.timezone_converter import TimezoneConverter
 from .filters.ai_comment_filter import AICommentFilter
 from ..presentation.markdown_formatter import MarkdownFormatter
@@ -147,3 +149,21 @@ class ServiceFactory:
         """
         summary_repository = SummaryRepository()
         return ListSummaryFilesService(summary_repository)
+    
+    @staticmethod
+    def create_workspace_switch_service(
+        logger: Optional[logging.Logger] = None
+    ) -> WorkspaceSwitchService:
+        """Create a workspace switch service with all dependencies.
+        
+        Args:
+            logger: Optional logger instance
+            
+        Returns:
+            Configured workspace switch service
+        """
+        # Create filesystem workspace repository
+        workspace_repository = FileSystemWorkspaceRepository(logger)
+        
+        # Create and return application service
+        return WorkspaceSwitchService(workspace_repository, logger)

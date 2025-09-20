@@ -67,6 +67,7 @@ python scripts/src/auth.py --clear-token
 | `pop_comments.py` | 欠落サマリーの先頭PRのレビューコメントをMarkdown形式で出力 |
 | `set_summary.py` | PRのレビュー要約を設定 |
 | `list_summary_files.py` | 指定リポジトリのサマリーファイルを優先度でフィルタリングして一覧表示 |
+| `switch_workspace.py` | ワークスペースの切り替え |
 | `auth.py` | GitHubトークンの管理 |
 
 ### fetch.py オプション
@@ -102,6 +103,13 @@ python scripts/src/auth.py --clear-token
 | `--priority` | ❌ | 優先度でフィルタリング（`high`, `middle`, `low`、複数指定可） | 全て |
 
 - リポジトリ情報は `workspace/workspace.yml` から取得します。
+
+### switch_workspace.py オプション
+
+| オプション | 必須 | 説明 | デフォルト |
+|-----------|------|------|-----------|
+| `--repo` | ✅ | リポジトリ仕様（`owner/repository`形式） | - |
+| `--verbose` | ❌ | 詳細出力を有効化 | `False` |
 
 ### auth.py オプション
 

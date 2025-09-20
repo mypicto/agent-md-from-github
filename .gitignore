@@ -1,8 +1,7 @@
-pullrequests/
-memorys/
 workspace/
-temp/
+workspaces/
 copilot-instructions.md
+AGENT.md
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
