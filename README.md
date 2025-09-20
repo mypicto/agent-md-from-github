@@ -117,9 +117,9 @@ workspace/
 ├── workspace.yml  # リポジトリ設定ファイル
 └── pullrequests/
     ├── 2025-09-01/
-    │   ├── PR-123-metadata.json
+    │   ├── PR-123.json
     ├── 2025-09-02/
-    │   ├── PR-456-metadata.json
+    │   ├── PR-456.json
     └── summaries/
         ├── PR-123.yml
         └── PR-456.yml
