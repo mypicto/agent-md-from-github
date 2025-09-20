@@ -29,7 +29,7 @@ class ServiceFactory:
     @staticmethod
     def create_pr_collection_service(
         github_token: str,
-        timezone: str = "Asia/Tokyo",
+        timezone: str = "UTC",
         logger: Optional[logging.Logger] = None
     ) -> PRReviewCollectionService:
         """Create a PR review collection service with all dependencies.

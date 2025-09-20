@@ -10,11 +10,11 @@ import pytz
 class TimezoneConverter:
     """Timezone conversion service implementation."""
     
-    def __init__(self, target_timezone: str = "Asia/Tokyo"):
+    def __init__(self, target_timezone: str = "UTC"):
         """Initialize timezone converter.
         
         Args:
-            target_timezone: Target timezone name (default: Asia/Tokyo)
+            target_timezone: Target timezone name (default: UTC)
         """
         self._target_timezone = pytz.timezone(target_timezone)
     

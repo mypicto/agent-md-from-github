@@ -69,8 +69,8 @@ class FetchController:
 
         parser.add_argument(
             "--timezone",
-            default="Asia/Tokyo",
-            help="Timezone for date filtering (default: Asia/Tokyo)"
+            default="UTC",
+            help="Timezone for date filtering (default: UTC)"
         )
 
         parser.add_argument(

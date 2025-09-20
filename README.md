@@ -76,7 +76,7 @@ python scripts/src/auth.py --clear-token
 |-----------|------|------|-----------|
 | `--from-date` | ✅ | 開始日（`YYYY-MM-DD`） | - |
 | `--to-date` | ✅ | 終了日（`YYYY-MM-DD`） | - |
-| `--timezone` | ❌ | タイムゾーン | `Asia/Tokyo` |
+| `--timezone` | ❌ | タイムゾーン | `UTC` |
 | `--token` | ❌ | GitHubトークン | 環境変数/キーリング |
 | `--verbose` | ❌ | 詳細出力 | `False` |
 

@@ -39,12 +39,12 @@ class TestServiceFactory:
             mock_service_class.return_value = mock_service_instance
 
             # Call the method
-            service = ServiceFactory.create_pr_collection_service("token", "Asia/Tokyo")
+            service = ServiceFactory.create_pr_collection_service("token", "UTC")
 
             # Assertions
             assert service == mock_service_instance
             mock_github_class.assert_called_once_with("token")
-            mock_timezone_class.assert_called_once_with("Asia/Tokyo")
+            mock_timezone_class.assert_called_once_with("UTC")
             mock_github_repo_class.assert_called_once_with(mock_github_instance, mock_timezone_instance)
             mock_pr_repo_class.assert_called_once_with()  # PullRequestMetadataRepository()
             mock_filter_class.assert_called_once()

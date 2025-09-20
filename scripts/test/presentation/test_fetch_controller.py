@@ -110,7 +110,7 @@ class TestFetchController:
             args.repo = 'owner/repo'
             args.from_date = datetime(2023, 1, 1)
             args.to_date = datetime(2023, 1, 2)
-            args.timezone = 'Asia/Tokyo'
+            args.timezone = 'UTC'
 
             controller._handle_collector_command(args)
 
@@ -128,7 +128,7 @@ class TestFetchController:
             mock_converter.return_value = mock_converter_instance
             mock_converter_instance.localize_date_range.return_value = (args.from_date, args.to_date)
 
-            date_range = controller._create_date_range(args, "Asia/Tokyo")
+            date_range = controller._create_date_range(args, "UTC")
 
             assert date_range is not None
 
@@ -140,7 +140,7 @@ class TestFetchController:
         args.to_date = datetime(2023, 1, 1)
 
         with pytest.raises(ValueError):
-            controller._create_date_range(args, "Asia/Tokyo")
+            controller._create_date_range(args, "UTC")
 
 
 class TestParseDate:
