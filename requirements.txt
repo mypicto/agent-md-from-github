@@ -12,4 +12,4 @@ python-dateutil>=2.8.2
 keyring>=24.0.0
 
 # YAML support for better readability
-PyYAML>=6.0
+ruamel.yaml>=0.18.0

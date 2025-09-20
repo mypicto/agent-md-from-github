@@ -70,9 +70,10 @@ class TestSummaryRepository:
         assert summary_path.exists()
 
         # Check content
-        import yaml
+        from ruamel.yaml import YAML
+        yaml = YAML()
         with open(summary_path, 'r') as f:
-            data = yaml.safe_load(f)
+            data = yaml.load(f)
 
         assert data["repository_id"]["owner"] == "test-owner"
         assert data["repository_id"]["name"] == "test-repo"
@@ -98,3 +99,30 @@ class TestSummaryRepository:
         """Test get returns None when file does not exist."""
         retrieved = repo.get(sample_summary.repository_id, sample_summary.pr_number)
         assert retrieved is None
+
+    def test_save_summary_with_special_characters_uses_literal_block(self, repo, temp_dir):
+        """Test that summary with special characters is saved in literal block format without quotes."""
+        # Create summary with special characters that would normally trigger quotes
+        summary_with_special_chars = ReviewSummary(
+            repository_id=RepositoryIdentifier(owner="test-owner", name="test-repo"),
+            pr_number=456,
+            priority="high",
+            summary="- **Category:** 設計\n  **What:** UseCaseでの入力バリデーションをJakarta Validatorに置き換え、`Validator`注入と`validate(param)`メソッドで制約違反を検出している。\n  **Why:** 入力制約をアノテーションで宣言することでバリデーションロジックを分離し一貫性を持たせ。"
+        )
+        
+        repo.save(summary_with_special_chars)
+        
+        summary_path = temp_dir / "test-owner" / "test-repo" / "summaries" / "PR-456.yml"
+        assert summary_path.exists()
+        
+        # Read the raw YAML content to check format
+        with open(summary_path, 'r', encoding='utf-8') as f:
+            yaml_content = f.read()
+        
+        # Check that summary field uses literal block format (starts with '"summary": |-')
+        assert '"summary": |-' in yaml_content
+        # Check that summary content is not quoted (no quotes around the multiline content)
+        assert '"- **Category:**' not in yaml_content
+        # Ensure the content preserves newlines and formatting
+        assert '**Category:** 設計' in yaml_content
+        assert '**What:** UseCaseでの入力バリデーション' in yaml_content

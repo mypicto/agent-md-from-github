@@ -4,7 +4,7 @@ Repository for managing PR summaries.
 
 from pathlib import Path
 from typing import Optional
-import yaml
+from ruamel.yaml import YAML
 
 from ...domain.interfaces.summary_repository_interface import SummaryRepositoryInterface
 from ...domain.pull_request_metadata import PullRequestMetadata
@@ -17,6 +17,10 @@ class SummaryRepository(SummaryRepositoryInterface):
 
     def __init__(self, base_directory: str = "pullrequests"):
         self._base_directory = Path(base_directory)
+        self._yaml = YAML()
+        self._yaml.default_style = '|'
+        self._yaml.allow_unicode = True
+        self._yaml.default_flow_style = False
 
     def _get_summary_path(self, repository_id: RepositoryIdentifier, pr_number: int, base_directory: Path) -> Path:
         """Generate the summary file path."""
@@ -48,7 +52,7 @@ class SummaryRepository(SummaryRepositoryInterface):
         }
 
         with open(file_path, 'w', encoding='utf-8') as f:
-            yaml.dump(data, f, default_flow_style=False, allow_unicode=True, default_style='|')
+            self._yaml.dump(data, f)
 
     def get(self, repository_id: RepositoryIdentifier, pr_number: int) -> Optional[ReviewSummary]:
         """Get a review summary by repository and PR number."""
@@ -57,7 +61,7 @@ class SummaryRepository(SummaryRepositoryInterface):
             return None
 
         with open(summary_path, 'r', encoding='utf-8') as f:
-            data = yaml.safe_load(f)
+            data = self._yaml.load(f)
 
         return ReviewSummary(
             repository_id=repository_id,
