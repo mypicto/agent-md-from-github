@@ -60,7 +60,7 @@ mode: agent
 ### pop_comments.py
 
 ```bash
-usage: pop_comments [-h] --repo REPO [--output-dir OUTPUT_DIR]
+usage: pop_comments [-h]
 Get comments for the next missing summary PR
 
 options:
@@ -70,7 +70,7 @@ options:
 ### set_summary.py
 
 ```bash
-usage: set_summary [-h] --repo REPO --pr PR --priority {high,middle,low} --file FILE
+usage: set_summary [-h] --pr PR --priority {high,middle,low} --file FILE
 Set review summary for a GitHub PR
 
 options:

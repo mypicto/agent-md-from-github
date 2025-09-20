@@ -40,7 +40,7 @@ mode: agent
 ### list_summary_files.py
 
 ```bash
-usage: list_summary_files [-h] --repo REPO [--priority {high,middle,low}]
+usage: list_summary_files [-h] [--priority {high,middle,low}]
 List summary files by priority
 
 options:
