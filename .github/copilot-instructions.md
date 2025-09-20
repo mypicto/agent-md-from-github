@@ -33,10 +33,6 @@
 * As Kent Beck and Martin Fowler note, remove redundant comments that merely restate the code itself.
 * As Martin Fowler advises in *Refactoring*, don't hide poor readability with comments—extract logic and give it meaningful names.
 
-## Testing
-
-* Test method names should be in Japanese and follow the format MethodName_StateUnderTest_ExpectedBehavior.
-
 ## Code Review
 
 * Be mindful of whether readability can be improved through better naming.
@@ -80,7 +76,13 @@ This project follows the **Clean Architecture** principles, inspired by Robert C
 
 ### Testing Structure
 
-- Tests are organized mirroring the source structure: `test/domain/`, `test/application/`, `test/infrastructure/`, `test/presentation/`.
+## Testing
+
+- Use pytest for testing.
+- Test directories are placed under the `scripts/test/` directory.
+- Tests are organized mirroring the source structure: `scripts/test/domain/`, `scripts/test/application/`, `scripts/test/infrastructure/`, `scripts/test/presentation/`.
+- Test file names should have the prefix 'test_'.
+- Test method names should be in Japanese and follow the format MethodName_StateUnderTest_ExpectedBehavior.
 
 ### Guidelines for New Team Members
 

@@ -61,7 +61,7 @@ class TestAICommentFilter(unittest.TestCase):
             diff_context="diff content"
         )
     
-    def test_filter_comments_removes_ai_comments(self):
+    def test_filter_comments_AIコメント除去_AIコメントが除去される(self):
         """Test that AI comments are filtered out."""
         comments = [self.copilot_comment, self.github_copilot_comment, self.ai_assistant_comment, self.human_comment]
         filtered = self.filter.filter_comments(comments)
@@ -74,7 +74,7 @@ class TestAICommentFilter(unittest.TestCase):
         self.assertIn("human_user", authors)
         self.assertNotIn("Copilot", authors)
     
-    def test_filter_comments_keeps_human_comments(self):
+    def test_filter_comments_人間コメント保持_人間コメントが保持される(self):
         """Test that human comments are kept."""
         comments = [self.human_comment]
         filtered = self.filter.filter_comments(comments)
@@ -82,14 +82,14 @@ class TestAICommentFilter(unittest.TestCase):
         self.assertEqual(len(filtered), 1)
         self.assertEqual(filtered[0].author, "human_user")
     
-    def test_filter_comments_empty_list(self):
+    def test_filter_comments_空リスト_空リストが返される(self):
         """Test filtering an empty list."""
         comments = []
         filtered = self.filter.filter_comments(comments)
         
         self.assertEqual(len(filtered), 0)
     
-    def test_filter_comments_only_ai_comments(self):
+    def test_filter_comments_AIコメントのみ_AIコメントが除去される(self):
         """Test filtering a list with only AI comments."""
         comments = [self.copilot_comment, self.github_copilot_comment, self.ai_assistant_comment]
         filtered = self.filter.filter_comments(comments)
@@ -101,7 +101,7 @@ class TestAICommentFilter(unittest.TestCase):
         self.assertIn("AI Assistant", authors)
         self.assertNotIn("Copilot", authors)
     
-    def test_filter_comments_mixed_authors(self):
+    def test_filter_comments_混合著者_人間コメントのみが返される(self):
         """Test filtering with various author types."""
         bot_comment = ReviewComment(
             comment_id=5,

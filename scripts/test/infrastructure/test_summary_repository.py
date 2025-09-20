@@ -49,7 +49,7 @@ class TestSummaryRepository:
             summary="Test summary content"
         )
 
-    def test_exists_summary_file_exists(self, repo, temp_dir, sample_metadata):
+    def test_exists_summary_要約ファイル存在_ファイルが存在する(self, repo, temp_dir, sample_metadata):
         """Test exists_summary returns True when file exists."""
         # Create the summary file
         summary_path = temp_dir / "test-owner" / "test-repo" / "summaries" / "PR-123.yml"
@@ -58,11 +58,11 @@ class TestSummaryRepository:
 
         assert repo.exists_summary(sample_metadata, temp_dir) is True
 
-    def test_exists_summary_file_not_exists(self, repo, temp_dir, sample_metadata):
+    def test_exists_summary_要約ファイル不存在_ファイルが存在しない(self, repo, temp_dir, sample_metadata):
         """Test exists_summary returns False when file does not exist."""
         assert repo.exists_summary(sample_metadata, temp_dir) is False
 
-    def test_save_creates_file(self, repo, temp_dir, sample_summary):
+    def test_save_ファイル作成_ファイルが作成される(self, repo, temp_dir, sample_summary):
         """Test save creates the summary file with correct content."""
         repo.save(sample_summary)
 
@@ -81,7 +81,7 @@ class TestSummaryRepository:
         assert data["priority"] == "high"
         assert data["summary"] == "Test summary content"
 
-    def test_get_existing_summary(self, repo, temp_dir, sample_summary):
+    def test_get_既存要約_要約が返される(self, repo, temp_dir, sample_summary):
         """Test get returns the summary when file exists."""
         # First save the summary
         repo.save(sample_summary)
@@ -95,12 +95,12 @@ class TestSummaryRepository:
         assert retrieved.priority == sample_summary.priority
         assert retrieved.summary == sample_summary.summary
 
-    def test_get_non_existing_summary(self, repo, sample_summary):
+    def test_get_不存在要約_Noneが返される(self, repo, sample_summary):
         """Test get returns None when file does not exist."""
         retrieved = repo.get(sample_summary.repository_id, sample_summary.pr_number)
         assert retrieved is None
 
-    def test_save_summary_with_special_characters_uses_literal_block(self, repo, temp_dir):
+    def test_save_特殊文字要約_リテラルブロックが使用される(self, repo, temp_dir):
         """Test that summary with special characters is saved in literal block format without quotes."""
         # Create summary with special characters that would normally trigger quotes
         summary_with_special_chars = ReviewSummary(

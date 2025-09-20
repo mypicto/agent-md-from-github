@@ -84,7 +84,7 @@ class TestMissingSummariesService(unittest.TestCase):
             repository_id=self.repo_id
         )
     
-    def test_list_missing_summaries_no_metadata(self):
+    def test_list_missing_summaries_メタデータなし_空リストが返される(self):
         """Test listing missing summaries when no metadata exists."""
         self.pr_metadata_repo.find_all_by_repository.return_value = []
         
@@ -93,7 +93,7 @@ class TestMissingSummariesService(unittest.TestCase):
         self.assertEqual(result, [])
         self.pr_metadata_repo.find_all_by_repository.assert_called_once_with(self.output_dir, self.repo_id)
     
-    def test_list_missing_summaries_all_have_summaries(self):
+    def test_list_missing_summaries_すべて要約あり_空リストが返される(self):
         """Test listing missing summaries when all have summaries."""
         self.pr_metadata_repo.find_all_by_repository.return_value = [self.metadata1, self.metadata2]
         self.summary_repo.exists_summary.return_value = True
@@ -103,7 +103,7 @@ class TestMissingSummariesService(unittest.TestCase):
         self.assertEqual(result, [])
         self.assertEqual(self.summary_repo.exists_summary.call_count, 2)
     
-    def test_list_missing_summaries_some_missing(self):
+    def test_list_missing_summaries_一部欠落_欠落PRが返される(self):
         """Test listing missing summaries when some are missing."""
         self.pr_metadata_repo.find_all_by_repository.return_value = [self.metadata1, self.metadata2]
         
@@ -117,7 +117,7 @@ class TestMissingSummariesService(unittest.TestCase):
         self.assertEqual(result, [456])
         self.assertEqual(self.summary_repo.exists_summary.call_count, 2)
     
-    def test_list_missing_summaries_all_missing(self):
+    def test_list_missing_summaries_すべて欠落_すべてPRが返される(self):
         """Test listing missing summaries when all are missing."""
         self.pr_metadata_repo.find_all_by_repository.return_value = [self.metadata1, self.metadata2]
         self.summary_repo.exists_summary.return_value = False
